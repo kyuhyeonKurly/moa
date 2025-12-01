@@ -63,6 +63,9 @@ struct JiraService {
             let backupDateFormatter = DateFormatter()
             backupDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
             
+            let releaseDateFormatter = DateFormatter()
+            releaseDateFormatter.dateFormat = "yyyy-MM-dd"
+            
             let pageIssues = searchResult.issues.map { issue -> ProcessedIssue in
                 // resolutiondate 우선 사용, 없으면 created 사용
                 let dateString = issue.fields.resolutiondate ?? issue.fields.created
@@ -70,6 +73,9 @@ struct JiraService {
                     ?? backupDateFormatter.date(from: dateString) 
                     ?? ISO8601DateFormatter().date(from: dateString)
                     ?? Date() // 파싱 실패 시 현재 시간 (주의: 이로 인해 12월로 몰릴 수 있음)
+                
+                let releaseDateString = issue.fields.fixVersions?.compactMap { $0.releaseDate }.first
+                let releaseDate = releaseDateString.flatMap { releaseDateFormatter.date(from: $0) }
                 
                 let projectKey = issue.key.split(separator: "-").first.map(String.init) ?? "UNKNOWN"
                 
@@ -101,7 +107,8 @@ struct JiraService {
                     parentSummary: parentSummary,
                     issueType: issueType,
                     isSubtask: issue.fields.issuetype.subtask,
-                    typeClass: typeClass
+                    typeClass: typeClass,
+                    releaseDate: releaseDate
                 )
             }
             
@@ -123,6 +130,7 @@ struct JiraService {
     private func resolveVersionsRecursively(issues: [ProcessedIssue], req: Request) async throws -> [ProcessedIssue] {
         var issueMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0) })
         var versionMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0.versions) })
+        var releaseDateMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0.releaseDate) })
         var parentMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0.parentKey) })
         
         for _ in 0..<3 {
@@ -138,6 +146,7 @@ struct JiraService {
                 for p in fetchedParents {
                     issueMap[p.key] = p
                     versionMap[p.key] = p.versions
+                    releaseDateMap[p.key] = p.releaseDate
                     parentMap[p.key] = p.parentKey
                 }
             }
@@ -146,6 +155,7 @@ struct JiraService {
             for key in unresolvedKeys {
                 if let pKey = parentMap[key] ?? nil, let pVersions = versionMap[pKey], !pVersions.isEmpty {
                     versionMap[key] = pVersions
+                    releaseDateMap[key] = releaseDateMap[pKey] ?? nil
                     changed = true
                 }
             }
@@ -167,7 +177,8 @@ struct JiraService {
                     parentSummary: issue.parentSummary,
                     issueType: issue.issueType,
                     isSubtask: issue.isSubtask,
-                    typeClass: issue.typeClass
+                    typeClass: issue.typeClass,
+                    releaseDate: releaseDateMap[issue.key] ?? nil
                 )
             }
             return issue
@@ -215,6 +226,8 @@ struct JiraService {
         
         let searchResult = try? response.content.decode(JiraSearchResponse.self)
         let dateFormatter = ISO8601DateFormatter()
+        let releaseDateFormatter = DateFormatter()
+        releaseDateFormatter.dateFormat = "yyyy-MM-dd"
         
         return searchResult?.issues.map { issue in
             let date = dateFormatter.date(from: issue.fields.created) ?? Date()
@@ -229,6 +242,9 @@ struct JiraService {
             
             let typeClass = self.getTypeClass(for: issue.fields.issuetype.name)
             
+            let releaseDateString = issue.fields.fixVersions?.compactMap { $0.releaseDate }.first
+            let releaseDate = releaseDateString.flatMap { releaseDateFormatter.date(from: $0) }
+            
             return ProcessedIssue(
                 key: issue.key,
                 summary: issue.fields.summary,
@@ -241,7 +257,8 @@ struct JiraService {
                 parentSummary: parentSummary,
                 issueType: issue.fields.issuetype.name,
                 isSubtask: issue.fields.issuetype.subtask,
-                typeClass: typeClass
+                typeClass: typeClass,
+                releaseDate: releaseDate
             )
         } ?? []
     }

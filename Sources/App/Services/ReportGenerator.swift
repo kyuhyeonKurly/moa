@@ -49,10 +49,13 @@ struct IssueNode: Encodable {
 
 struct ReportGenerator {
     static func generateContext(issues: [ProcessedIssue], year: Int) -> ReportContext {
-        // 1. 월별 통계
+        // 1. 월별 통계 (Release Date 기준)
         let calendar = Calendar.current
         let issuesByMonth = Dictionary(grouping: issues) { issue in
-            calendar.component(.month, from: issue.createdDate)
+            if let releaseDate = issue.releaseDate {
+                return calendar.component(.month, from: releaseDate)
+            }
+            return calendar.component(.month, from: issue.createdDate)
         }
         
         let monthlyStats = issuesByMonth.keys.sorted().map { month in
@@ -92,6 +95,12 @@ struct ReportGenerator {
                     v.contains("버전할당 대기") || v.contains("버전 할당 대기")
                 }
             }.sorted { issue1, issue2 in
+                // 1. 릴리즈 날짜 순
+                if let d1 = issue1.releaseDate, let d2 = issue2.releaseDate, d1 != d2 {
+                    return d1 < d2
+                }
+                
+                // 2. 우선순위 순
                 let p1 = getTypePriority(issue1.issueType)
                 let p2 = getTypePriority(issue2.issueType)
                 

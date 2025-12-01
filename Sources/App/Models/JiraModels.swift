@@ -30,7 +30,10 @@ struct JiraFields: Content {
         let name: String 
         let subtask: Bool
     }
-    struct JiraVersion: Content { let name: String }
+    struct JiraVersion: Content { 
+        let name: String 
+        let releaseDate: String?
+    }
     struct JiraParent: Content {
         let key: String
         let fields: JiraParentFields
@@ -66,4 +69,5 @@ struct ProcessedIssue: Content {
     let issueType: String
     let isSubtask: Bool
     let typeClass: String
+    let releaseDate: Date?
 }
