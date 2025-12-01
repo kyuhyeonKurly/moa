@@ -120,6 +120,13 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label for="spaceKey">
+                    Confluence Space Key (Optional)
+                </label>
+                <input type="text" id="spaceKey" name="spaceKey" placeholder="예: /wiki/spaces/appr/overview 👉 appr" #if(savedSpaceKey): value="#(savedSpaceKey)" #endif>
+            </div>
+
             <button type="submit">리포트 생성하기</button>
         </form>
     </div>

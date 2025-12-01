@@ -5,6 +5,7 @@ struct ReportContext: Encodable {
     let totalCount: Int
     let typeCounts: [TypeCountItem]
     let monthlyGrid: [MonthlyGridItem]
+    let spaceKey: String? // Added spaceKey
     
     // 기존 필드 (하위 호환성 유지)
     let monthlyStats: [MonthlyStat]
@@ -48,7 +49,7 @@ struct IssueNode: Encodable {
 }
 
 struct ReportGenerator {
-    static func generateContext(issues: [ProcessedIssue], year: Int) -> ReportContext {
+    static func generateContext(issues: [ProcessedIssue], year: Int, spaceKey: String? = nil) -> ReportContext {
         // 1. 월별 통계 (Release Date 기준)
         let calendar = Calendar.current
         let issuesByMonth = Dictionary(grouping: issues) { issue in
@@ -188,6 +189,7 @@ struct ReportGenerator {
             totalCount: issues.count,
             typeCounts: typeCounts,
             monthlyGrid: monthlyGrid,
+            spaceKey: spaceKey,
             monthlyStats: monthlyStats,
             projects: projects,
             versionProjects: versionProjects
