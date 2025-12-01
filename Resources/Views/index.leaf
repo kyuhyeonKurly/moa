@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moa - Jira 회고 리포트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #1d1d1f;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .help-text {
+            font-size: 0.8rem;
+            color: #86868b;
+            margin-top: 0.25rem;
+        }
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: #0071e3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background-color: #0077ed;
+        }
+        .token-link {
+            font-size: 0.8rem;
+            color: #0071e3;
+            text-decoration: none;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Moa 회고 리포트</h1>
+        <form action="/moa/collect" method="POST">
+            <div class="form-group">
+                <label for="year">회고 연도</label>
+                <input type="number" id="year" name="year" value="2025" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Jira 이메일</label>
+                <input type="email" id="email" name="email" 
+                       placeholder="#if(hasEmail): 서버 설정값 사용됨 (입력 시 덮어쓰기) #else: example@kurlycorp.com #endif">
+            </div>
+
+            <div class="form-group">
+                <label for="token">
+                    Jira API 토큰
+                    <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" class="token-link">토큰 발급받기 &rarr;</a>
+                </label>
+                <input type="password" id="token" name="token" 
+                       placeholder="#if(hasToken): 서버 설정값 사용됨 (입력 시 덮어쓰기) #else: API 토큰을 입력하세요 #endif">
+                #if(hasToken):
+                <p class="help-text">✅ 서버에 토큰이 설정되어 있습니다. 변경하려면 입력하세요.</p>
+                #endif
+            </div>
+
+            <button type="submit">리포트 생성하기</button>
+        </form>
+    </div>
+</body>
+</html>

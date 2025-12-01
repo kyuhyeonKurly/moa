@@ -4,7 +4,7 @@ struct JiraService {
     let client: Client
     let apiBaseURL = "https://kurly0521.atlassian.net"
 
-    func fetchIssues(year: Int, assignee: String? = nil, req: Request) async throws -> [ProcessedIssue] {
+    func fetchIssues(year: Int, assignee: String? = nil, email: String? = nil, token: String? = nil, req: Request) async throws -> [ProcessedIssue] {
         let assigneeClause = assignee != nil ? "assignee = \"\(assignee!)\"" : "assignee = currentUser()"
         
         // 사용자 검증 JQL 반영 (단순화)
@@ -15,9 +15,14 @@ struct JiraService {
         ORDER BY created DESC
         """
         
-        let email = Environment.get("JIRA_EMAIL") ?? ""
-        let apiToken = Environment.get("JIRA_TOKEN") ?? ""
-        let authString = "\(email):\(apiToken)".data(using: .utf8)?.base64EncodedString() ?? ""
+        let finalEmail = email ?? Environment.get("JIRA_EMAIL") ?? ""
+        let finalToken = token ?? Environment.get("JIRA_TOKEN") ?? ""
+        
+        if finalEmail.isEmpty || finalToken.isEmpty {
+             throw Abort(.unauthorized, reason: "Jira Email or Token is missing.")
+        }
+
+        let authString = "\(finalEmail):\(finalToken)".data(using: .utf8)?.base64EncodedString() ?? ""
         
         let headers: HTTPHeaders = [
             "Authorization": "Basic \(authString)",
