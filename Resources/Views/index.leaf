@@ -82,7 +82,10 @@
             <p class="help-text">저장된 계정으로 바로 리포트를 생성할까요?</p>
             
             <form action="/moa/collect" method="POST">
-                <input type="hidden" name="year" value="2025">
+                <div style="margin-bottom: 1rem; text-align: left;">
+                    <label for="quick-year" style="font-size: 0.9rem; color: #666;">회고 연도</label>
+                    <input type="number" id="quick-year" name="year" value="2025" style="padding: 0.5rem;">
+                </div>
                 <button type="submit" style="margin-bottom: 1rem;">🚀 바로 리포트 보기</button>
             </form>
             

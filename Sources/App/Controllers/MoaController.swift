@@ -14,7 +14,7 @@ struct MoaController: RouteCollection {
         
         return try await req.view.render("index", [
             "savedEmail": savedEmail,
-            "hasTokenCookie": hasTokenCookie
+            "hasTokenCookie": hasTokenCookie ? "true" : nil
         ])
     }
 
@@ -34,15 +34,18 @@ struct MoaController: RouteCollection {
         // 2. 데이터 가공 (Context 생성)
         let context = ReportGenerator.generateContext(issues: issues, year: year)
         
-        // 3. Leaf 템플릿 렌더링 및 쿠키 설정
-        let view = try await req.view.render("report", context)
-        let response = try await view.encodeResponse(for: req)
+        // 3. Leaf 템플릿 렌더링
+        // Vapor 4의 async render는 View를 반환합니다.
+        let view = try await req.view.render("report", context).get()
+        
+        // 4. Response 생성 및 쿠키 설정
+        let response = try await view.encodeResponse(for: req).get()
         
         // 로그인 성공 시 쿠키에 저장 (30일 유지)
         if let email = email, let token = token {
-            let cookieOptions = HTTPCookies.Value.SameSite.lax
-            response.cookies["moa_email"] = .init(string: email, maxAge: 60*60*24*30, sameSite: cookieOptions)
-            response.cookies["moa_token"] = .init(string: token, maxAge: 60*60*24*30, sameSite: cookieOptions)
+            // Vapor 4.x: HTTPCookies.Value(string: ..., sameSite: .lax)
+            response.cookies["moa_email"] = HTTPCookies.Value(string: email, maxAge: 60*60*24*30, sameSite: .lax)
+            response.cookies["moa_token"] = HTTPCookies.Value(string: token, maxAge: 60*60*24*30, sameSite: .lax)
         }
         
         return response

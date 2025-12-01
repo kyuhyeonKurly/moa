@@ -17,13 +17,19 @@ struct JiraIssue: Content {
 struct JiraFields: Content {
     let summary: String
     let created: String
+    let resolutiondate: String? // 추가
     let status: JiraStatus
+    let issuetype: JiraIssueType
     let labels: [String]
     let fixVersions: [JiraVersion]?
     let parent: JiraParent?
     
     // 중첩된 필드 디코딩
     struct JiraStatus: Content { let name: String }
+    struct JiraIssueType: Content { 
+        let name: String 
+        let subtask: Bool
+    }
     struct JiraVersion: Content { let name: String }
     struct JiraParent: Content {
         let key: String
@@ -55,4 +61,9 @@ struct ProcessedIssue: Content {
     let projectKey: String
     let parentKey: String?   // 바로 위 부모 (Epic, Story, Task 등)
     let parentSummary: String?
+    
+    // 추가된 필드
+    let issueType: String
+    let isSubtask: Bool
+    let typeClass: String
 }

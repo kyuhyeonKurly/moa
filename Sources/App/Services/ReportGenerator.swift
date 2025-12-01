@@ -3,9 +3,24 @@ import Vapor
 struct ReportContext: Encodable {
     let year: Int
     let totalCount: Int
+    let typeCounts: [TypeCountItem]
+    let monthlyGrid: [MonthlyGridItem]
+    
+    // 기존 필드 (하위 호환성 유지)
     let monthlyStats: [MonthlyStat]
-    let projects: [ProjectGroup] // 에픽별 보기
-    let versionProjects: [ProjectGroup] // 버전별 보기 (구조 재사용)
+    let projects: [ProjectGroup]
+    let versionProjects: [ProjectGroup]
+}
+
+struct TypeCountItem: Encodable {
+    let type: String
+    let count: Int
+}
+
+struct MonthlyGridItem: Encodable {
+    let monthName: String
+    let monthIndex: Int
+    let issues: [ProcessedIssue]
 }
 
 struct MonthlyStat: Encodable {
@@ -44,18 +59,63 @@ struct ReportGenerator {
             MonthlyStat(month: month, count: issuesByMonth[month]?.count ?? 0)
         }
         
-        // 공통: 프로젝트별 그룹화
+        // 2. 타입별 카운트
+        var typeCountsDict: [String: Int] = [:]
+        for issue in issues {
+            typeCountsDict[issue.issueType, default: 0] += 1
+        }
+        
+        let typeCounts = typeCountsDict.map { key, value in
+            TypeCountItem(type: key, count: value)
+        }.sorted { item1, item2 in
+            let p1 = getTypePriority(item1.type)
+            let p2 = getTypePriority(item2.type)
+            
+            if p1 != p2 {
+                return p1 < p2
+            } else {
+                return item1.count > item2.count
+            }
+        }
+        
+        // 3. 월별 그리드 (1월 ~ 12월)
+        // 조건: 버전이 있고, 서브태스크가 아닌 최상위 티켓만 표시
+        var monthlyGrid: [MonthlyGridItem] = []
+        let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        
+        for i in 1...12 {
+            let monthIssues = issuesByMonth[i] ?? []
+            let filteredIssues = monthIssues.filter { issue in
+                !issue.versions.isEmpty && 
+                !issue.isSubtask &&
+                !issue.versions.contains { v in 
+                    v.contains("버전할당 대기") || v.contains("버전 할당 대기")
+                }
+            }.sorted { issue1, issue2 in
+                let p1 = getTypePriority(issue1.issueType)
+                let p2 = getTypePriority(issue2.issueType)
+                
+                if p1 != p2 {
+                    return p1 < p2
+                }
+                return issue1.createdDate < issue2.createdDate
+            }
+            
+            monthlyGrid.append(MonthlyGridItem(
+                monthName: monthNames[i-1],
+                monthIndex: i,
+                issues: filteredIssues
+            ))
+        }
+        
+        // 공통: 프로젝트별 그룹화 (기존 로직 유지)
         let issuesByProject = Dictionary(grouping: issues) { $0.projectKey }
         let sortedProjectKeys = issuesByProject.keys.sorted()
         
-        // 2. 에픽별 보기 데이터 생성
+        // 4. 에픽별 보기 데이터 생성
         let projects = sortedProjectKeys.map { pKey -> ProjectGroup in
             let projectIssues = issuesByProject[pKey] ?? []
-            let issuesByEpic = Dictionary(grouping: projectIssues) { $0.parentKey ?? "NO_EPIC" } // parentKey가 에픽일 수도 있고 아닐 수도 있지만, 에픽 뷰에서는 최상위 부모를 에픽으로 간주하거나, 에픽 필드를 따로 써야 함.
-            // 주의: ProcessedIssue의 parentKey는 바로 위 부모임. 에픽 뷰를 위해서는 'Epic Link' 개념이 필요할 수 있음.
-            // 하지만 현재 로직상 parentKey를 에픽으로 가정하고 진행 (Team-managed 프로젝트 등)
-            // 만약 parentKey가 Story라면? 에픽 뷰가 좀 이상해질 수 있음.
-            // 일단 기존 로직 유지: parentKey를 기준으로 그룹화.
+            let issuesByEpic = Dictionary(grouping: projectIssues) { $0.parentKey ?? "NO_EPIC" }
             
             let sortedEpicKeys = issuesByEpic.keys.sorted {
                 if $0 == "NO_EPIC" { return false }
@@ -68,9 +128,8 @@ struct ReportGenerator {
                 let firstIssue = epicIssues.first!
                 
                 let title = eKey == "NO_EPIC" ? "기타 (에픽 없음)" : (firstIssue.parentSummary ?? "Unknown Epic")
-                let link = eKey == "NO_EPIC" ? nil : firstIssue.link.replacingOccurrences(of: firstIssue.key, with: eKey) // 링크 생성 트릭
+                let link = eKey == "NO_EPIC" ? nil : firstIssue.link.replacingOccurrences(of: firstIssue.key, with: eKey)
                 
-                // 에픽 뷰는 플랫하게 보여줌 (기존 유지)
                 let nodes = epicIssues.map { IssueNode(issue: $0, children: []) }
                 
                 return SubGroup(title: title, key: eKey == "NO_EPIC" ? nil : eKey, link: link, roots: nodes, isVersion: false, count: epicIssues.count)
@@ -79,7 +138,7 @@ struct ReportGenerator {
             return ProjectGroup(name: pKey, groups: groups)
         }
         
-        // 3. 버전별 보기 데이터 생성 (트리 구조 적용)
+        // 5. 버전별 보기 데이터 생성
         let versionProjects = sortedProjectKeys.map { pKey -> ProjectGroup in
             let projectIssues = issuesByProject[pKey] ?? []
             
@@ -118,6 +177,8 @@ struct ReportGenerator {
         return ReportContext(
             year: year,
             totalCount: issues.count,
+            typeCounts: typeCounts,
+            monthlyGrid: monthlyGrid,
             monthlyStats: monthlyStats,
             projects: projects,
             versionProjects: versionProjects
@@ -151,5 +212,19 @@ struct ReportGenerator {
         }
         
         return roots.map { createNode(issue: $0) }
+    }
+
+    private static func getTypePriority(_ type: String) -> Int {
+        let order = [
+            "Epic", "에픽",
+            "Story", "스토리",
+            "Improvement", "개선",
+            "Bug", "버그",
+            "Design", "디자인",
+            "Task", "작업",
+            "Sub-task", "하위 작업",
+            "BI 요청"
+        ]
+        return order.firstIndex(of: type) ?? 999
     }
 }

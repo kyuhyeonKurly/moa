@@ -29,8 +29,6 @@ struct JiraService {
             "Accept": "application/json"
         ]
 
-        // Jira API 변경 대응: /rest/api/3/search -> /rest/api/3/search/jql
-        // 이 엔드포인트는 startAt 대신 nextPageToken을 사용합니다.
         let uri = URI(string: "\(apiBaseURL)/rest/api/3/search/jql")
         
         var allIssues: [ProcessedIssue] = []
@@ -39,11 +37,11 @@ struct JiraService {
         var isFinished = false
         
         while !isFinished {
-            let currentToken = nextPageToken // Capture for closure
+            let currentToken = nextPageToken
             let response = try await client.post(uri, headers: headers) { req in
                 let searchRequest = JiraSearchRequest(
                     jql: jql,
-                    fields: ["summary", "status", "labels", "created", "fixVersions", "parent"],
+                    fields: ["summary", "status", "labels", "created", "resolutiondate", "fixVersions", "parent", "issuetype"],
                     maxResults: maxResults,
                     nextPageToken: currentToken
                 )
@@ -57,12 +55,22 @@ struct JiraService {
             
             let searchResult = try response.content.decode(JiraSearchResponse.self)
             
-            let dateFormatter = ISO8601DateFormatter()
+            // Jira 날짜 포맷터 (밀리초 포함 대응)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            
+            // 백업 포맷터 (밀리초 없는 경우)
+            let backupDateFormatter = DateFormatter()
+            backupDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
             
             let pageIssues = searchResult.issues.map { issue -> ProcessedIssue in
-                let date = dateFormatter.date(from: issue.fields.created) ?? Date()
+                // resolutiondate 우선 사용, 없으면 created 사용
+                let dateString = issue.fields.resolutiondate ?? issue.fields.created
+                let date = dateFormatter.date(from: dateString) 
+                    ?? backupDateFormatter.date(from: dateString) 
+                    ?? ISO8601DateFormatter().date(from: dateString)
+                    ?? Date() // 파싱 실패 시 현재 시간 (주의: 이로 인해 12월로 몰릴 수 있음)
                 
-                // 프로젝트 키 추출 (KMA-123 -> KMA)
                 let projectKey = issue.key.split(separator: "-").first.map(String.init) ?? "UNKNOWN"
                 
                 var parentKey: String? = nil
@@ -73,6 +81,14 @@ struct JiraService {
                     parentSummary = parent.fields.summary
                 }
                 
+                // 이슈 유형 이름 변경 (간소화)
+                var issueType = issue.fields.issuetype.name
+                if issueType == "Service Request with Approvals" {
+                    issueType = "BI 요청"
+                }
+                
+                let typeClass = self.getTypeClass(for: issueType)
+                
                 return ProcessedIssue(
                     key: issue.key,
                     summary: issue.fields.summary,
@@ -82,13 +98,15 @@ struct JiraService {
                     link: "\(self.apiBaseURL)/browse/\(issue.key)",
                     projectKey: projectKey,
                     parentKey: parentKey,
-                    parentSummary: parentSummary
+                    parentSummary: parentSummary,
+                    issueType: issueType,
+                    isSubtask: issue.fields.issuetype.subtask,
+                    typeClass: typeClass
                 )
             }
             
             allIssues.append(contentsOf: pageIssues)
             
-            // Pagination Logic (Cursor based)
             if let token = searchResult.nextPageToken, !token.isEmpty {
                 nextPageToken = token
             } else {
@@ -96,27 +114,23 @@ struct JiraService {
             }
         }
         
-        // [고도화] 재귀적 버전 추적 (Sub-task -> Story -> Epic)
+        // [고도화] 재귀적 버전 추적
         allIssues = try await resolveVersionsRecursively(issues: allIssues, req: req)
         
         return allIssues
     }
     
-    // 재귀적으로 부모를 찾아 버전을 상속받는 로직
     private func resolveVersionsRecursively(issues: [ProcessedIssue], req: Request) async throws -> [ProcessedIssue] {
         var issueMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0) })
         var versionMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0.versions) })
         var parentMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0.parentKey) })
         
-        // 최대 3단계 깊이까지 부모를 추적 (Sub-task -> Story -> Epic)
         for _ in 0..<3 {
-            // 버전이 없고 부모가 있는 이슈들 식별
             let unresolvedKeys = issueMap.keys.filter { (versionMap[$0]?.isEmpty ?? true) && parentMap[$0] != nil }
             if unresolvedKeys.isEmpty { break }
             
-            // 우리가 모르는 부모(아직 fetch 안된 이슈) 찾기
             let knownKeys = Set(issueMap.keys)
-            let requiredParentKeys = Set(unresolvedKeys.compactMap { parentMap[$0] ?? nil }) // Optional Unwrapping
+            let requiredParentKeys = Set(unresolvedKeys.compactMap { parentMap[$0] ?? nil })
             let missingParentKeys = requiredParentKeys.subtracting(knownKeys)
             
             if !missingParentKeys.isEmpty {
@@ -128,10 +142,8 @@ struct JiraService {
                 }
             }
             
-            // 버전 전파 (부모 -> 자식)
             var changed = false
             for key in unresolvedKeys {
-                // parentMap[key]는 String? 이므로 옵셔널 바인딩 필요
                 if let pKey = parentMap[key] ?? nil, let pVersions = versionMap[pKey], !pVersions.isEmpty {
                     versionMap[key] = pVersions
                     changed = true
@@ -141,7 +153,6 @@ struct JiraService {
             if !changed && missingParentKeys.isEmpty { break }
         }
         
-        // 원래 리스트에 버전 정보 업데이트하여 반환
         return issues.map { issue in
             if let v = versionMap[issue.key], !v.isEmpty {
                 return ProcessedIssue(
@@ -153,21 +164,32 @@ struct JiraService {
                     link: issue.link,
                     projectKey: issue.projectKey,
                     parentKey: issue.parentKey,
-                    parentSummary: issue.parentSummary
+                    parentSummary: issue.parentSummary,
+                    issueType: issue.issueType,
+                    isSubtask: issue.isSubtask,
+                    typeClass: issue.typeClass
                 )
             }
             return issue
         }
     }
     
-    // 특정 키 목록으로 이슈 정보를 가져오는 헬퍼
+    private func getTypeClass(for typeName: String) -> String {
+        switch typeName {
+        case "Epic", "에픽": return "type-epic"
+        case "Story", "스토리": return "type-story"
+        case "Task", "작업": return "type-task"
+        case "Bug", "버그": return "type-bug"
+        case "Improvement", "개선": return "type-improvement"
+        case "Design", "디자인": return "type-design"
+        default: return "type-default"
+        }
+    }
+    
     private func fetchIssuesByKeys(keys: [String], req: Request) async throws -> [ProcessedIssue] {
-        guard !keys.isEmpty else { return [] }
+        if keys.isEmpty { return [] }
         
-        // JQL: key in (KMA-100, KMA-101, ...)
         let jql = "key in (\(keys.joined(separator: ",")))"
-        let uri = URI(string: "\(apiBaseURL)/rest/api/3/search/jql")
-        
         let email = Environment.get("JIRA_EMAIL") ?? ""
         let apiToken = Environment.get("JIRA_TOKEN") ?? ""
         let authString = "\(email):\(apiToken)".data(using: .utf8)?.base64EncodedString() ?? ""
@@ -177,21 +199,27 @@ struct JiraService {
             "Accept": "application/json"
         ]
         
+        let uri = URI(string: "\(apiBaseURL)/rest/api/3/search/jql")
+        
         let response = try await client.post(uri, headers: headers) { req in
             let searchRequest = JiraSearchRequest(
                 jql: jql,
-                fields: ["summary", "status", "labels", "created", "fixVersions", "parent"],
-                maxResults: 100,
+                fields: ["summary", "status", "labels", "created", "fixVersions", "parent", "issuetype"],
+                maxResults: keys.count,
                 nextPageToken: nil
             )
             try req.content.encode(searchRequest)
         }
         
         guard response.status == .ok else { return [] }
+        
         let searchResult = try? response.content.decode(JiraSearchResponse.self)
+        let dateFormatter = ISO8601DateFormatter()
         
         return searchResult?.issues.map { issue in
+            let date = dateFormatter.date(from: issue.fields.created) ?? Date()
             let projectKey = issue.key.split(separator: "-").first.map(String.init) ?? "UNKNOWN"
+            
             var parentKey: String? = nil
             var parentSummary: String? = nil
             if let parent = issue.fields.parent {
@@ -199,16 +227,21 @@ struct JiraService {
                 parentSummary = parent.fields.summary
             }
             
+            let typeClass = self.getTypeClass(for: issue.fields.issuetype.name)
+            
             return ProcessedIssue(
                 key: issue.key,
                 summary: issue.fields.summary,
-                createdDate: Date(), // 날짜는 중요하지 않음
+                createdDate: date,
                 labels: issue.fields.labels,
                 versions: issue.fields.fixVersions?.map { $0.name } ?? [],
                 link: "\(self.apiBaseURL)/browse/\(issue.key)",
                 projectKey: projectKey,
                 parentKey: parentKey,
-                parentSummary: parentSummary
+                parentSummary: parentSummary,
+                issueType: issue.fields.issuetype.name,
+                isSubtask: issue.fields.issuetype.subtask,
+                typeClass: typeClass
             )
         } ?? []
     }
