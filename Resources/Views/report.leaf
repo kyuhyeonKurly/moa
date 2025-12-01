@@ -236,7 +236,7 @@
                             <div class="issue-meta">
                                 <span class="type-badge">#(issue.issueType)</span>
                                 #for(v in issue.versions):
-                                <span style="font-size: 0.6rem; color: #666; background-color: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">#(v)</span>
+                                <span style="font-size: 0.6rem; color: #666; background-color: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">#(v.name)</span>
                                 #endfor
                             </div>
                         </li>
@@ -278,7 +278,7 @@
                                 <li style="box-shadow: none; border-bottom: 1px solid #f0f0f0; margin-bottom: 0; border-radius: 0; padding: 8px;">
                                     <a href="#(root.issue.link)" target="_blank">#(root.issue.key)</a>: #(root.issue.summary)
                                     #if(count(root.issue.versions) > 0):
-                                        <code>#for(version in root.issue.versions): #(version) #endfor</code>
+                                        <code>#for(version in root.issue.versions): #(version.name) #endfor</code>
                                     #endif
                                 </li>
                                 #endfor

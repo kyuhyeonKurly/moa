@@ -143,28 +143,47 @@ struct MoaController: RouteCollection {
                 html += "<td style='vertical-align: top;'>"
                 if let monthData = context.monthlyGrid.first(where: { $0.monthIndex == m }), !monthData.issues.isEmpty {
                     // 버전별로 그룹화
-                    let issuesByVersion = Dictionary(grouping: monthData.issues) { issue -> String in
+                    var issuesByVersion: [VersionInfo: [ProcessedIssue]] = [:]
+                    var noVersionIssues: [ProcessedIssue] = []
+                    
+                    for issue in monthData.issues {
                         if let version = issue.versions.first {
-                            let dateStr = issue.releaseDate.map { ISO8601DateFormatter().string(from: $0).prefix(10) } ?? ""
-                            return "\(version) (\(dateStr))"
+                            issuesByVersion[version, default: []].append(issue)
+                        } else {
+                            noVersionIssues.append(issue)
                         }
-                        return "버전 없음"
                     }
                     
                     // 버전 정렬 (릴리즈 날짜 순)
                     let sortedVersions = issuesByVersion.keys.sorted { v1, v2 in
-                        if v1 == "버전 없음" { return false }
-                        if v2 == "버전 없음" { return true }
-                        return v1 < v2 // 문자열 비교지만 날짜가 포함되어 있어 얼추 맞음. 정확히 하려면 별도 로직 필요
+                        if let d1 = v1.releaseDate, let d2 = v2.releaseDate {
+                            return d1 < d2
+                        }
+                        return v1.name < v2.name
                     }
                     
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yy/MM/dd"
+                    
                     for version in sortedVersions {
-                        html += "<p><strong>\(version)</strong></p>"
+                        let dateStr = version.releaseDate.map { dateFormatter.string(from: $0) } ?? ""
+                        let issues = issuesByVersion[version] ?? []
+                        let projectKey = issues.first?.projectKey ?? "KMA"
+                        let versionUrl = "https://kurly0521.atlassian.net/projects/\(projectKey)/versions/\(version.id)"
+                        
+                        html += "<p><a href='\(versionUrl)'><strong>\(version.name) (\(dateStr))</strong></a></p>"
                         html += "<ul>"
-                        if let issues = issuesByVersion[version] {
-                            for issue in issues {
-                                html += #"<li><a href="\#(issue.link)" data-card-appearance="inline">\#(issue.link)</a></li>"#
-                            }
+                        for issue in issues {
+                            html += #"<li><a href="\#(issue.link)" data-card-appearance="inline">\#(issue.link)</a></li>"#
+                        }
+                        html += "</ul>"
+                    }
+                    
+                    if !noVersionIssues.isEmpty {
+                        html += "<p><strong>버전 없음</strong></p>"
+                        html += "<ul>"
+                        for issue in noVersionIssues {
+                            html += #"<li><a href="\#(issue.link)" data-card-appearance="inline">\#(issue.link)</a></li>"#
                         }
                         html += "</ul>"
                     }

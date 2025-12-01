@@ -93,7 +93,7 @@ struct ReportGenerator {
                 !issue.versions.isEmpty && 
                 !issue.isSubtask &&
                 !issue.versions.contains { v in 
-                    v.contains("버전할당 대기") || v.contains("버전 할당 대기")
+                    v.name.contains("버전할당 대기") || v.name.contains("버전 할당 대기")
                 }
             }.sorted { issue1, issue2 in
                 // 1. 릴리즈 날짜 순
@@ -159,7 +159,7 @@ struct ReportGenerator {
                     issuesByVersion["Unversioned", default: []].append(issue)
                 } else {
                     let normalizedVersions = Set(issue.versions.map { version -> String in
-                        return version.replacingOccurrences(of: " - iOS", with: "")
+                        return version.name.replacingOccurrences(of: " - iOS", with: "")
                                       .replacingOccurrences(of: " - Android", with: "")
                     })
                     

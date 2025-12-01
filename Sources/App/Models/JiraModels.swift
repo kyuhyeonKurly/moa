@@ -31,6 +31,7 @@ struct JiraFields: Content {
         let subtask: Bool
     }
     struct JiraVersion: Content { 
+        let id: String
         let name: String 
         let releaseDate: String?
     }
@@ -57,7 +58,7 @@ struct ProcessedIssue: Content {
     let summary: String
     let createdDate: Date
     let labels: [String]
-    let versions: [String]
+    let versions: [VersionInfo] // String -> VersionInfo 변경
     let link: String
     
     // 구조화된 정보 추가
@@ -69,5 +70,11 @@ struct ProcessedIssue: Content {
     let issueType: String
     let isSubtask: Bool
     let typeClass: String
+    let releaseDate: Date?
+}
+
+struct VersionInfo: Content, Hashable {
+    let id: String
+    let name: String
     let releaseDate: Date?
 }
