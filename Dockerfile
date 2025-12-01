@@ -2,7 +2,7 @@
 # ================================
 # Build Image
 # ================================
-FROM swift:5.9-jammy as build
+FROM swift:6.0-jammy as build
 
 WORKDIR /build
 
@@ -20,7 +20,7 @@ RUN swift build -c release
 # ================================
 # Run Image
 # ================================
-FROM swift:5.9-jammy-slim
+FROM swift:6.0-jammy-slim
 
 WORKDIR /app
 
