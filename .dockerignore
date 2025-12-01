@@ -1,0 +1,7 @@
+.build
+.swiftpm
+.git
+.vscode
+.env
+*.xcodeproj
+*.xcworkspace
