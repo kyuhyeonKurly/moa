@@ -1,4 +1,15 @@
+# Xcode & Swift
 .build/
+.swiftpm/
+xcuserdata/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+timeline.xctimeline
+playground.xcworkspace
+
+# Local Config
 .env
 .DS_Store
 .vscode/
