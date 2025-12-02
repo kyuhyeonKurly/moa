@@ -4,10 +4,16 @@ struct JiraTestCommand: Command {
     struct Signature: CommandSignature {
         @Argument(name: "projectKey", help: "The Project Key to test (e.g. KMA)")
         var projectKey: String
+        
+        @Option(name: "year", short: "y", help: "Filter versions by release year (e.g. 2025)")
+        var year: Int?
+        
+        @Option(name: "version", short: "v", help: "Specific Version ID to search issues for (e.g. 14051)")
+        var versionId: String?
     }
 
     var help: String {
-        "Tests Jira API integration: Fetch Versions -> Get Version Details -> Search Issues"
+        "Tests Jira API integration: Fetch Versions (Filter by Year) -> Search Issues in Latest Version"
     }
 
     func run(using context: CommandContext, signature: Signature) throws {
@@ -30,8 +36,9 @@ struct JiraTestCommand: Command {
     func runAsync(using context: CommandContext, signature: Signature) async throws {
         let app = context.application
         let projectKey = signature.projectKey
+        let targetYear = signature.year ?? 2025
         
-        context.console.print("🚀 Starting Jira API Test for Project: \(projectKey)")
+        context.console.print("🚀 Starting Jira API Test for Project: \(projectKey), Year: \(targetYear)")
         
         // 0. Load Credentials
         let email = Environment.get("JIRA_EMAIL") ?? ""
@@ -50,7 +57,7 @@ struct JiraTestCommand: Command {
         let apiBaseURL = "https://kurly0521.atlassian.net"
         
         // 1. Fetch Project Versions
-        context.console.print("\n1️⃣  Step 1: Fetching Project Versions...")
+        context.console.print("\n1️⃣  Test 1: Fetching All Versions & Filtering by Year \(targetYear)...")
         let versionsUri = URI(string: "\(apiBaseURL)/rest/api/3/project/\(projectKey)/versions")
         
         let versionsResponse = try await app.client.get(versionsUri, headers: headers)
@@ -60,28 +67,10 @@ struct JiraTestCommand: Command {
             if let body = versionsResponse.body {
                 context.console.print(String(buffer: body))
             }
-            
-            // Debug: List all visible projects
-            context.console.print("\n🔍 Debug: Listing all visible projects...")
-            let projectsUri = URI(string: "\(apiBaseURL)/rest/api/3/project")
-            let projectsResponse = try await app.client.get(projectsUri, headers: headers)
-            
-            if projectsResponse.status == .ok, projectsResponse.body != nil {
-                struct Project: Decodable {
-                    let key: String
-                    let name: String
-                }
-                let projects = try? projectsResponse.content.decode([Project].self)
-                let keys = projects?.map { "\($0.key) (\($0.name))" }.joined(separator: ", ") ?? "None"
-                context.console.print("📋 Visible Projects: \(keys)")
-            } else {
-                context.console.print("❌ Failed to list projects: \(projectsResponse.status)")
-            }
-            
             return
         }
         
-        // Decode to find a suitable version (released in 2025 or latest released)
+        // Decode to find a suitable version
         struct MinimalVersion: Decodable {
             let id: String
             let name: String
@@ -91,54 +80,53 @@ struct JiraTestCommand: Command {
         
         let versions = try versionsResponse.content.decode([MinimalVersion].self)
         
-        // Print pretty JSON for inspection
-        if let body = versionsResponse.body,
-           let data = body.getData(at: 0, length: body.readableBytes),
-           let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
-           let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: [.prettyPrinted]),
-           let prettyString = String(data: prettyData, encoding: .utf8) {
-            context.console.print("✅ Versions JSON Structure (First 3 items):")
-            // Too long to print all, just print a snippet or the whole thing if user wants schema
-            // User asked for schema, but 299 versions is huge. Let's print the first item only to show schema.
-            if let array = jsonObject as? [[String: Any]], let first = array.first,
-               let firstData = try? JSONSerialization.data(withJSONObject: first, options: [.prettyPrinted]),
-               let firstString = String(data: firstData, encoding: .utf8) {
-                context.console.print(firstString)
-                context.console.print("... (and \(array.count - 1) more)")
+        // Filter by Year
+        let filteredVersions = versions.filter { version in
+            guard version.released, let date = version.releaseDate else { return false }
+            return date.hasPrefix("\(targetYear)")
+        }
+        
+        context.console.print("✅ Found \(filteredVersions.count) versions released in \(targetYear).")
+        for version in filteredVersions {
+            context.console.print("   - \(version.name) (ID: \(version.id), Date: \(version.releaseDate ?? ""))")
+        }
+        
+        if filteredVersions.isEmpty {
+            context.console.print("⚠️ No versions found for \(targetYear).")
+            // Don't return here, proceed to check if versionId is provided
+        }
+        
+        // 2. Search Issues (Old Step 3)
+        let targetVersionId: String
+        let targetVersionName: String
+        
+        if let specificVersionId = signature.versionId {
+            context.console.print("\n2️⃣  Test 2: Fetching Issues for specific version ID: \(specificVersionId)...")
+            // Try to find name from fetched versions
+            if let found = versions.first(where: { $0.id == specificVersionId }) {
+                targetVersionId = found.id
+                targetVersionName = found.name
             } else {
-                context.console.print(prettyString)
-            }
-        }
-        
-        context.console.print("✅ Found \(versions.count) versions.")
-        
-        // Find a target version to test (Preferably released, and recent)
-        guard let targetVersion = versions.filter({ $0.released && $0.releaseDate != nil }).sorted(by: { $0.releaseDate! > $1.releaseDate! }).first else {
-            context.console.print("⚠️ No released versions found with a release date.")
-            return
-        }
-        
-        context.console.print("🎯 Target Version: \(targetVersion.name) (ID: \(targetVersion.id), Date: \(targetVersion.releaseDate ?? "N/A"))")
-        
-        // 2. Fetch Version Details
-        context.console.print("\n2️⃣  Step 2: Fetching Version Details...")
-        let versionDetailUri = URI(string: "\(apiBaseURL)/rest/api/3/version/\(targetVersion.id)")
-        let versionDetailResponse = try await app.client.get(versionDetailUri, headers: headers)
-        
-        if versionDetailResponse.status == .ok {
-            context.console.print("✅ Version Details Fetched:")
-            if let body = versionDetailResponse.body {
-                context.console.print(String(buffer: body)) // Print raw JSON to verify format
+                targetVersionId = specificVersionId
+                targetVersionName = "Unknown (ID: \(specificVersionId))"
             }
         } else {
-            context.console.print("❌ Failed to fetch version details.")
+            context.console.print("\n2️⃣  Test 2: Fetching Issues for the latest version in \(targetYear)...")
+            
+            if filteredVersions.isEmpty {
+                context.console.print("⚠️ No versions found for \(targetYear). Stopping.")
+                return
+            }
+            
+            guard let latest = filteredVersions.sorted(by: { $0.releaseDate! > $1.releaseDate! }).first else { return }
+            targetVersionId = latest.id
+            targetVersionName = latest.name
         }
         
-        // 3. Search Issues in this Version
-        context.console.print("\n3️⃣  Step 3: Searching Issues in Version...")
+        context.console.print("🎯 Target Version: \(targetVersionName) (ID: \(targetVersionId))")
+        
         let searchUri = URI(string: "\(apiBaseURL)/rest/api/3/search/jql")
-        // JQL needs to be properly escaped or passed in body
-        let jql = "project = \"\(projectKey)\" AND fixVersion = \(targetVersion.id)"
+        let jql = "project = \"\(projectKey)\" AND fixVersion = \(targetVersionId)"
         
         struct SearchRequest: Content {
             let jql: String

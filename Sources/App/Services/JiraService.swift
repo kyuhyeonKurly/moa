@@ -3,7 +3,18 @@ import Vapor
 struct JiraService {
     let apiClient: JiraAPIClient
     
-    func fetchIssues(year: Int, assignee: String? = nil) async throws -> [ProcessedIssue] {
+    func fetchIssues(year: Int, assignee: String? = nil, platform: String? = nil) async throws -> [ProcessedIssue] {
+        // 0. 내 정보 가져오기 (AccountId 식별용)
+        var myAccountId: String?
+        if assignee == nil {
+            let myselfUri = URI(string: "\(apiClient.apiBaseURL)/rest/api/3/myself")
+            if let myselfResponse = try? await apiClient.client.get(myselfUri, headers: apiClient.headers),
+               myselfResponse.status == .ok,
+               let myself = try? myselfResponse.content.decode(Myself.self) {
+                myAccountId = myself.accountId
+            }
+        }
+        
         // 1. 먼저 사용자가 활동한 프로젝트를 찾기 위해 광범위한 검색 수행
         let assigneeClause = assignee != nil ? "assignee = \"\(assignee!)\"" : "assignee = currentUser()"
         let discoveryJql = """
@@ -13,10 +24,10 @@ struct JiraService {
         """
         
         // 2. 1차 검색 실행 (프로젝트 식별용)
-        var allIssues = try await executeJqlSearch(jql: discoveryJql)
+        let discoveryIssues = try await executeJqlSearch(jql: discoveryJql, platform: platform)
         
         // 3. 식별된 프로젝트들의 해당 연도 릴리즈 버전 조회
-        let projectKeys = Set(allIssues.map { $0.projectKey })
+        let projectKeys = Set(discoveryIssues.map { $0.projectKey })
         var targetVersionIds: [String] = []
         
         for projectKey in projectKeys {
@@ -28,34 +39,81 @@ struct JiraService {
             targetVersionIds.append(contentsOf: targetVersions.map { $0.id })
         }
         
-        // 4. 해당 버전들에 포함된 이슈 추가 검색
+        // 4. 해당 버전들에 포함된 이슈 추가 검색 (2-Pass Strategy)
+        var finalIssues: [ProcessedIssue] = []
+        
         if !targetVersionIds.isEmpty {
-            let chunkSize = 50
+            let chunkSize = 30
             let chunks = stride(from: 0, to: targetVersionIds.count, by: chunkSize).map {
                 Array(targetVersionIds[$0..<min($0 + chunkSize, targetVersionIds.count)])
             }
             
             for chunk in chunks {
                 let versionIdsStr = chunk.joined(separator: ",")
-                let versionJqlSafe = """
-                \(assigneeClause) 
-                AND fixVersion in (\(versionIdsStr))
-                """
                 
-                let versionIssues = try await executeJqlSearch(jql: versionJqlSafe)
+                // Pass 1: 버전 내 *모든* 이슈 조회
+                let versionJql = "fixVersion in (\(versionIdsStr))"
+                let versionIssues = try await executeJqlSearch(jql: versionJql, platform: platform)
                 
-                // 중복 제거 후 병합
-                let existingKeys = Set(allIssues.map { $0.key })
-                let newIssues = versionIssues.filter { !existingKeys.contains($0.key) }
-                allIssues.append(contentsOf: newIssues)
+                // Pass 2: 내 하위 작업 조회
+                let versionIssueKeys = versionIssues.map { $0.key }
+                var mySubtasksMap: [String: [ProcessedIssue]] = [:]
+                
+                if !versionIssueKeys.isEmpty {
+                    let keyChunkSize = 50
+                    let keyChunks = stride(from: 0, to: versionIssueKeys.count, by: keyChunkSize).map {
+                        Array(versionIssueKeys[$0..<min($0 + keyChunkSize, versionIssueKeys.count)])
+                    }
+                    
+                    for keyChunk in keyChunks {
+                        let keysStr = keyChunk.joined(separator: ",")
+                        // assigneeClause 사용 (currentUser() 또는 특정 사용자)
+                        let subtaskJql = "parent in (\(keysStr)) AND \(assigneeClause)"
+                        
+                        let subtasks = try await executeJqlSearch(jql: subtaskJql, platform: platform)
+                        for sub in subtasks {
+                            if let pKey = sub.parentKey {
+                                mySubtasksMap[pKey, default: []].append(sub)
+                            }
+                        }
+                    }
+                }
+                
+                // 필터링 및 병합
+                for issue in versionIssues {
+                    let isAssignedToMe: Bool
+                    if let targetAssignee = assignee {
+                        // 이름으로 비교 (정확하지 않을 수 있음)
+                        isAssignedToMe = issue.assigneeName == targetAssignee
+                    } else {
+                        // AccountId로 비교 (정확함)
+                        isAssignedToMe = (myAccountId != nil && issue.assigneeAccountId == myAccountId)
+                    }
+                    
+                    let hasMySubtasks = (mySubtasksMap[issue.key]?.count ?? 0) > 0
+                    
+                    if isAssignedToMe || hasMySubtasks {
+                        finalIssues.append(issue)
+                    }
+                }
             }
         }
         
+        // 중복 제거
+        let uniqueIssues = Array(Set(finalIssues.map { $0.key })).compactMap { key in
+            finalIssues.first { $0.key == key }
+        }
+        
         // 5. 버전 정보 재매핑
-        return try await resolveVersionsRecursively(issues: allIssues)
+        return try await resolveVersionsRecursively(issues: uniqueIssues)
     }
     
-    private func executeJqlSearch(jql: String) async throws -> [ProcessedIssue] {
+    struct Myself: Decodable {
+        let accountId: String
+        let displayName: String
+    }
+    
+    private func executeJqlSearch(jql: String, platform: String? = nil) async throws -> [ProcessedIssue] {
         var issues: [ProcessedIssue] = []
         var nextPageToken: String? = nil
         let maxResults = 100
@@ -64,7 +122,7 @@ struct JiraService {
         while !isFinished {
             let searchResult = try await apiClient.searchIssues(
                 jql: jql,
-                fields: ["summary", "status", "labels", "created", "resolutiondate", "fixVersions", "parent", "issuetype"],
+                fields: ["summary", "status", "labels", "created", "resolutiondate", "fixVersions", "parent", "issuetype", "assignee"],
                 maxResults: maxResults,
                 nextPageToken: nextPageToken
             )
@@ -83,8 +141,26 @@ struct JiraService {
                     ?? ISO8601DateFormatter().date(from: dateString)
                     ?? Date()
                 
-                let releaseDateString = issue.fields.fixVersions?.compactMap { $0.releaseDate }.first
-                let releaseDate = releaseDateString.flatMap { releaseDateFormatter.date(from: $0) }
+                // Version Mapping & Sorting
+                let rawVersions: [VersionInfo] = issue.fields.fixVersions?.map { version in
+                    let vDate = version.releaseDate.flatMap { releaseDateFormatter.date(from: $0) }
+                    return VersionInfo(id: version.id, name: version.name, releaseDate: vDate)
+                } ?? []
+                
+                let sortedVersions: [VersionInfo]
+                if let platform = platform, !platform.isEmpty {
+                    sortedVersions = rawVersions.sorted { v1, v2 in
+                        let v1Matches = v1.name.localizedCaseInsensitiveContains(platform)
+                        let v2Matches = v2.name.localizedCaseInsensitiveContains(platform)
+                        if v1Matches && !v2Matches { return true }
+                        if !v1Matches && v2Matches { return false }
+                        return false // Keep original order
+                    }
+                } else {
+                    sortedVersions = rawVersions
+                }
+                
+                let releaseDate = sortedVersions.first?.releaseDate
                 
                 let projectKey = issue.key.split(separator: "-").first.map(String.init) ?? "UNKNOWN"
                 
@@ -104,10 +180,7 @@ struct JiraService {
                     summary: issue.fields.summary,
                     createdDate: date,
                     labels: issue.fields.labels,
-                    versions: issue.fields.fixVersions?.map { version in
-                        let vDate = version.releaseDate.flatMap { releaseDateFormatter.date(from: $0) }
-                        return VersionInfo(id: version.id, name: version.name, releaseDate: vDate)
-                    } ?? [],
+                    versions: sortedVersions,
                     link: "\(apiClient.apiBaseURL)/browse/\(issue.key)",
                     projectKey: projectKey,
                     parentKey: parentKey,
@@ -115,7 +188,9 @@ struct JiraService {
                     issueType: issueType,
                     isSubtask: issue.fields.issuetype.subtask,
                     typeClass: typeClass,
-                    releaseDate: releaseDate
+                    releaseDate: releaseDate,
+                    assigneeAccountId: issue.fields.assignee?.accountId,
+                    assigneeName: issue.fields.assignee?.displayName
                 )
             }
             
@@ -181,7 +256,9 @@ struct JiraService {
                     issueType: issue.issueType,
                     isSubtask: issue.isSubtask,
                     typeClass: issue.typeClass,
-                    releaseDate: releaseDateMap[issue.key] ?? nil
+                    releaseDate: releaseDateMap[issue.key] ?? nil,
+                    assigneeAccountId: issue.assigneeAccountId,
+                    assigneeName: issue.assigneeName
                 )
             }
             return issue

@@ -34,13 +34,15 @@ struct MoaController: RouteCollection {
         let email = req.query[String.self, at: "email"] ?? req.content[String.self, at: "email"] ?? req.cookies["moa_email"]?.string ?? ""
         let token = req.query[String.self, at: "token"] ?? req.content[String.self, at: "token"] ?? req.cookies["moa_token"]?.string ?? ""
         let spaceKey = req.query[String.self, at: "spaceKey"] ?? req.content[String.self, at: "spaceKey"] ?? req.cookies["moa_space_key"]?.string ?? ""
+        let platform = req.query[String.self, at: "platform"] ?? req.content[String.self, at: "platform"] ?? ""
 
         return try await req.view.render("loading", [
             "year": "\(year)",
             "assignee": assignee,
             "email": email,
             "token": token,
-            "spaceKey": spaceKey
+            "spaceKey": spaceKey,
+            "platform": platform
         ])
     }
 
@@ -52,6 +54,7 @@ struct MoaController: RouteCollection {
             let email: String
             let token: String
             let spaceKey: String?
+            let platform: String? // "iOS" or "Android"
         }
         
         let params = try req.content.decode(ReportRequest.self)
@@ -62,7 +65,7 @@ struct MoaController: RouteCollection {
         // 1. 이슈 모으기
         // assignee가 빈 문자열이면 nil로 처리
         let assignee = (params.assignee?.isEmpty ?? true) ? nil : params.assignee
-        let issues = try await jiraService.fetchIssues(year: params.year, assignee: assignee)
+        let issues = try await jiraService.fetchIssues(year: params.year, assignee: assignee, platform: params.platform)
         
         // 2. 데이터 가공 (Context 생성)
         let context = ReportGenerator.generateContext(issues: issues, year: params.year, spaceKey: params.spaceKey)

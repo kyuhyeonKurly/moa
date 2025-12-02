@@ -77,7 +77,7 @@
         <h1>Moa 회고 리포트</h1>
         
         #if(savedEmail):
-        <div class="form-group" style="text-align: center; margin-bottom: 2rem;">
+        <div id="saved-account-section" class="form-group" style="text-align: center; margin-bottom: 2rem;">
             <p style="font-size: 1.1rem; color: #1d1d1f;">👋 반가워요, <strong>#(savedEmail)</strong>님!</p>
             <p class="help-text">저장된 계정으로 바로 리포트를 생성할까요?</p>
             
@@ -86,10 +86,20 @@
                     <label for="quick-year" style="font-size: 0.9rem; color: #666;">회고 연도</label>
                     <input type="number" id="quick-year" name="year" value="2025" style="padding: 0.5rem;">
                 </div>
+                
+                <div style="margin-bottom: 1rem; text-align: left;">
+                    <label for="quick-platform" style="font-size: 0.9rem; color: #666;">플랫폼 (선택)</label>
+                    <select id="quick-platform" name="platform" style="width: 100%; padding: 0.5rem; border: 1px solid #d2d2d7; border-radius: 8px; background: white;">
+                        <option value="">전체</option>
+                        <option value="iOS">iOS</option>
+                        <option value="Android">Android</option>
+                    </select>
+                </div>
+
                 <button type="submit" style="margin-bottom: 1rem;">🚀 바로 리포트 보기</button>
             </form>
             
-            <button onclick="document.getElementById('login-form').style.display='block'; this.style.display='none';" 
+            <button onclick="document.getElementById('saved-account-section').style.display='none'; document.getElementById('login-form').style.display='block';" 
                     style="background-color: #f5f5f7; color: #1d1d1f; border: 1px solid #d2d2d7;">
                 다른 계정으로 로그인
             </button>
@@ -100,6 +110,15 @@
             <div class="form-group">
                 <label for="year">회고 연도</label>
                 <input type="number" id="year" name="year" value="2025" required>
+            </div>
+
+            <div class="form-group">
+                <label for="platform">플랫폼 (선택)</label>
+                <select id="platform" name="platform" style="width: 100%; padding: 0.8rem; border: 1px solid #d2d2d7; border-radius: 8px; font-size: 1rem; background: white;">
+                    <option value="">전체</option>
+                    <option value="iOS">iOS</option>
+                    <option value="Android">Android</option>
+                </select>
             </div>
 
             <div class="form-group">

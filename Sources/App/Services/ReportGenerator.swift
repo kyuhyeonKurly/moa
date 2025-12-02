@@ -59,28 +59,32 @@ struct ReportGenerator {
             return calendar.component(.month, from: issue.createdDate)
         }
         
-        let monthlyStats = issuesByMonth.keys.sorted().map { month in
-            MonthlyStat(month: month, count: issuesByMonth[month]?.count ?? 0)
-        }
+        // [Modified] 통계 비활성화
+        // let monthlyStats = issuesByMonth.keys.sorted().map { month in
+        //     MonthlyStat(month: month, count: issuesByMonth[month]?.count ?? 0)
+        // }
+        let monthlyStats: [MonthlyStat] = []
         
         // 2. 타입별 카운트
-        var typeCountsDict: [String: Int] = [:]
-        for issue in issues {
-            typeCountsDict[issue.issueType, default: 0] += 1
-        }
-        
-        let typeCounts = typeCountsDict.map { key, value in
-            TypeCountItem(type: key, count: value)
-        }.sorted { item1, item2 in
-            let p1 = getTypePriority(item1.type)
-            let p2 = getTypePriority(item2.type)
-            
-            if p1 != p2 {
-                return p1 < p2
-            } else {
-                return item1.count > item2.count
-            }
-        }
+        // [Modified] 타입별 요약 비활성화
+        // var typeCountsDict: [String: Int] = [:]
+        // for issue in issues {
+        //     typeCountsDict[issue.issueType, default: 0] += 1
+        // }
+        // 
+        // let typeCounts = typeCountsDict.map { key, value in
+        //     TypeCountItem(type: key, count: value)
+        // }.sorted { item1, item2 in
+        //     let p1 = getTypePriority(item1.type)
+        //     let p2 = getTypePriority(item2.type)
+        //     
+        //     if p1 != p2 {
+        //         return p1 < p2
+        //     } else {
+        //         return item1.count > item2.count
+        //     }
+        // }
+        let typeCounts: [TypeCountItem] = []
         
         // 3. 월별 그리드 (1월 ~ 12월)
         // 조건: 버전이 있고, 서브태스크가 아닌 최상위 티켓만 표시
@@ -118,81 +122,30 @@ struct ReportGenerator {
             ))
         }
         
-        // 공통: 프로젝트별 그룹화 (기존 로직 유지)
-        let issuesByProject = Dictionary(grouping: issues) { $0.projectKey }
-        let sortedProjectKeys = issuesByProject.keys.sorted()
-        
-        // 4. 에픽별 보기 데이터 생성
-        let projects = sortedProjectKeys.map { pKey -> ProjectGroup in
-            let projectIssues = issuesByProject[pKey] ?? []
-            let issuesByEpic = Dictionary(grouping: projectIssues) { $0.parentKey ?? "NO_EPIC" }
-            
-            let sortedEpicKeys = issuesByEpic.keys.sorted {
-                if $0 == "NO_EPIC" { return false }
-                if $1 == "NO_EPIC" { return true }
-                return $0 < $1
-            }
-            
-            let groups = sortedEpicKeys.map { eKey -> SubGroup in
-                let epicIssues = issuesByEpic[eKey] ?? []
-                let firstIssue = epicIssues.first!
-                
-                let title = eKey == "NO_EPIC" ? "기타 (에픽 없음)" : (firstIssue.parentSummary ?? "Unknown Epic")
-                let link = eKey == "NO_EPIC" ? nil : firstIssue.link.replacingOccurrences(of: firstIssue.key, with: eKey)
-                
-                let nodes = epicIssues.map { IssueNode(issue: $0, children: []) }
-                
-                return SubGroup(title: title, key: eKey == "NO_EPIC" ? nil : eKey, link: link, roots: nodes, isVersion: false, count: epicIssues.count)
-            }
-            
-            return ProjectGroup(name: pKey, groups: groups)
-        }
-        
-        // 5. 버전별 보기 데이터 생성
-        let versionProjects = sortedProjectKeys.map { pKey -> ProjectGroup in
-            let projectIssues = issuesByProject[pKey] ?? []
-            
-            var issuesByVersion: [String: [ProcessedIssue]] = [:]
-            
-            for issue in projectIssues {
-                if issue.versions.isEmpty {
-                    issuesByVersion["Unversioned", default: []].append(issue)
-                } else {
-                    let normalizedVersions = Set(issue.versions.map { version -> String in
-                        return version.name.replacingOccurrences(of: " - iOS", with: "")
-                                      .replacingOccurrences(of: " - Android", with: "")
-                    })
-                    
-                    for version in normalizedVersions {
-                        issuesByVersion[version, default: []].append(issue)
-                    }
-                }
-            }
-            
-            let sortedVersionNames = issuesByVersion.keys.sorted {
-                if $0 == "Unversioned" { return false }
-                if $1 == "Unversioned" { return true }
-                return $0 > $1
-            }
-            
-            let groups = sortedVersionNames.map { vName -> SubGroup in
-                let vIssues = issuesByVersion[vName] ?? []
-                let roots = buildIssueTree(issues: vIssues)
-                return SubGroup(title: vName, key: nil, link: nil, roots: roots, isVersion: true, count: vIssues.count)
-            }
-            
-            return ProjectGroup(name: pKey, groups: groups)
-        }
+        // [Modified] 에픽별/버전별 보기 비활성화
+        // // 공통: 프로젝트별 그룹화 (기존 로직 유지)
+        // let issuesByProject = Dictionary(grouping: issues) { $0.projectKey }
+        // let sortedProjectKeys = issuesByProject.keys.sorted()
+        // 
+        // // 4. 에픽별 보기 데이터 생성
+        // let projects = sortedProjectKeys.map { pKey -> ProjectGroup in
+        //     ...
+        // }
+        // 
+        // // 5. 버전별 보기 데이터 생성
+        // let versionProjects = sortedProjectKeys.map { pKey -> ProjectGroup in
+        //     ...
+        // }
         
         return ReportContext(
             year: year,
-            totalCount: issues.count,
+            totalCount: 0, // [Modified] 총 티켓 수 비활성화
             typeCounts: typeCounts,
             monthlyGrid: monthlyGrid,
             spaceKey: spaceKey,
             monthlyStats: monthlyStats,
-            projects: projects,
-            versionProjects: versionProjects
+            projects: [], // [Modified] 에픽별 보기 비활성화
+            versionProjects: [] // [Modified] 버전별 보기 비활성화
         )
     }
     
