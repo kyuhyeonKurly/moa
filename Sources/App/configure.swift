@@ -6,7 +6,8 @@ public func configure(_ app: Application) async throws {
     app.views.use(.leaf)
     
     // register commands
-    app.commands.use(JiraTestCommand(), as: "jira-test")
+    app.commands.use(JiraVersionsCommand(), as: "jira-versions")
+    app.commands.use(JiraVersionDetailCommand(), as: "jira-version-detail")
     
     try routes(app)
 }
