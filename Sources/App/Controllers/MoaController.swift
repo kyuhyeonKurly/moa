@@ -30,10 +30,16 @@ struct MoaController: RouteCollection {
         let token = req.query[String.self, at: "token"] ?? req.content[String.self, at: "token"] ?? req.cookies["moa_token"]?.string
         let spaceKey = req.query[String.self, at: "spaceKey"] ?? req.content[String.self, at: "spaceKey"] ?? req.cookies["moa_space_key"]?.string
         
-        let jiraService = JiraService(client: req.client)
+        let jiraClient: JiraAPIClient
+        if let email = email, let token = token {
+            jiraClient = JiraAPIClient(client: req.client, email: email, token: token)
+        } else {
+            jiraClient = req.application.jiraClient
+        }
+        let jiraService = JiraService(apiClient: jiraClient)
         
         // 1. 이슈 모으기
-        let issues = try await jiraService.fetchIssues(year: year, assignee: assignee, email: email, token: token, req: req)
+        let issues = try await jiraService.fetchIssues(year: year, assignee: assignee)
         
         // 2. 데이터 가공 (Context 생성)
         let context = ReportGenerator.generateContext(issues: issues, year: year, spaceKey: spaceKey)
@@ -72,8 +78,9 @@ struct MoaController: RouteCollection {
         }
         
         // 2. 데이터 다시 조회
-        let jiraService = JiraService(client: req.client)
-        let issues = try await jiraService.fetchIssues(year: year, email: email, token: token, req: req)
+        let jiraClient = JiraAPIClient(client: req.client, email: email, token: token)
+        let jiraService = JiraService(apiClient: jiraClient)
+        let issues = try await jiraService.fetchIssues(year: year)
         
         // 3. 전체 데이터 컨텍스트 생성
         let context = ReportGenerator.generateContext(issues: issues, year: year, spaceKey: spaceKey)

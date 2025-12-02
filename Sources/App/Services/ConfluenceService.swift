@@ -36,34 +36,3 @@ struct ConfluenceService {
     }
 }
 
-struct ConfluencePageCreateRequest: Content {
-    let title: String
-    let type: String
-    let space: Space
-    let status: String
-    let body: Body
-    
-    struct Space: Content {
-        let key: String
-    }
-    
-    struct Body: Content {
-        let storage: Storage
-    }
-    
-    struct Storage: Content {
-        let value: String
-        let representation: String
-    }
-}
-
-struct ConfluencePageResponse: Content {
-    let id: String
-    let title: String
-    let status: String
-    let _links: Links
-    
-    struct Links: Content {
-        let webui: String
-    }
-}
