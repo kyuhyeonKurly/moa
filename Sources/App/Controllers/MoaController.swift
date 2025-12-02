@@ -4,8 +4,14 @@ struct MoaController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         routes.get("", use: index)
         let moa = routes.grouped("moa")
-        moa.get("collect", use: collectAndPublish)
-        moa.post("collect", use: collectAndPublish)
+        
+        // 화면 진입 (Loading 페이지)
+        moa.get("collect", use: showLoadingPage)
+        moa.post("collect", use: showLoadingPage)
+        
+        // 실제 데이터 처리 (API)
+        moa.post("api", "report", use: generateReport)
+        
         moa.post("create-draft", use: createDraft)
     }
 
@@ -21,44 +27,57 @@ struct MoaController: RouteCollection {
         ])
     }
 
-    func collectAndPublish(req: Request) async throws -> Response {
+    func showLoadingPage(req: Request) async throws -> View {
+        // 파라미터 수집 (Query or Content or Cookie)
         let year = req.query[Int.self, at: "year"] ?? req.content[Int.self, at: "year"] ?? 2023
-        let assignee = req.query[String.self, at: "assignee"] ?? req.content[String.self, at: "assignee"]
-        
-        // 우선순위: 1. 폼 입력/쿼리  2. 쿠키  3. 환경변수(백업)
-        let email = req.query[String.self, at: "email"] ?? req.content[String.self, at: "email"] ?? req.cookies["moa_email"]?.string
-        let token = req.query[String.self, at: "token"] ?? req.content[String.self, at: "token"] ?? req.cookies["moa_token"]?.string
-        let spaceKey = req.query[String.self, at: "spaceKey"] ?? req.content[String.self, at: "spaceKey"] ?? req.cookies["moa_space_key"]?.string
-        
-        let jiraClient: JiraAPIClient
-        if let email = email, let token = token {
-            jiraClient = JiraAPIClient(client: req.client, email: email, token: token)
-        } else {
-            jiraClient = req.application.jiraClient
+        let assignee = req.query[String.self, at: "assignee"] ?? req.content[String.self, at: "assignee"] ?? ""
+        let email = req.query[String.self, at: "email"] ?? req.content[String.self, at: "email"] ?? req.cookies["moa_email"]?.string ?? ""
+        let token = req.query[String.self, at: "token"] ?? req.content[String.self, at: "token"] ?? req.cookies["moa_token"]?.string ?? ""
+        let spaceKey = req.query[String.self, at: "spaceKey"] ?? req.content[String.self, at: "spaceKey"] ?? req.cookies["moa_space_key"]?.string ?? ""
+
+        return try await req.view.render("loading", [
+            "year": "\(year)",
+            "assignee": assignee,
+            "email": email,
+            "token": token,
+            "spaceKey": spaceKey
+        ])
+    }
+
+    func generateReport(req: Request) async throws -> Response {
+        // API 요청은 JSON Body로 받는다고 가정
+        struct ReportRequest: Content {
+            let year: Int
+            let assignee: String?
+            let email: String
+            let token: String
+            let spaceKey: String?
         }
+        
+        let params = try req.content.decode(ReportRequest.self)
+        
+        let jiraClient = JiraAPIClient(client: req.client, email: params.email, token: params.token)
         let jiraService = JiraService(apiClient: jiraClient)
         
         // 1. 이슈 모으기
-        let issues = try await jiraService.fetchIssues(year: year, assignee: assignee)
+        // assignee가 빈 문자열이면 nil로 처리
+        let assignee = (params.assignee?.isEmpty ?? true) ? nil : params.assignee
+        let issues = try await jiraService.fetchIssues(year: params.year, assignee: assignee)
         
         // 2. 데이터 가공 (Context 생성)
-        let context = ReportGenerator.generateContext(issues: issues, year: year, spaceKey: spaceKey)
+        let context = ReportGenerator.generateContext(issues: issues, year: params.year, spaceKey: params.spaceKey)
         
         // 3. Leaf 템플릿 렌더링
-        // Vapor 4의 async render는 View를 반환합니다.
         let view = try await req.view.render("report", context).get()
         
         // 4. Response 생성 및 쿠키 설정
         let response = try await view.encodeResponse(for: req).get()
         
         // 로그인 성공 시 쿠키에 저장 (30일 유지)
-        if let email = email, let token = token {
-            // Vapor 4.x: HTTPCookies.Value(string: ..., sameSite: .lax)
-            response.cookies["moa_email"] = HTTPCookies.Value(string: email, maxAge: 60*60*24*30, sameSite: .lax)
-            response.cookies["moa_token"] = HTTPCookies.Value(string: token, maxAge: 60*60*24*30, sameSite: .lax)
-        }
+        response.cookies["moa_email"] = HTTPCookies.Value(string: params.email, maxAge: 60*60*24*30, sameSite: .lax)
+        response.cookies["moa_token"] = HTTPCookies.Value(string: params.token, maxAge: 60*60*24*30, sameSite: .lax)
         
-        if let spaceKey = spaceKey, !spaceKey.isEmpty {
+        if let spaceKey = params.spaceKey, !spaceKey.isEmpty {
             response.cookies["moa_space_key"] = HTTPCookies.Value(string: spaceKey, maxAge: 60*60*24*30, sameSite: .lax)
         }
         

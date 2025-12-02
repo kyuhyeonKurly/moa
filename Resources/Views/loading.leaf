@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Moa: 리포트 생성 중...</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #5f0080;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status {
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .progress-container {
+            width: 100%;
+            max-width: 400px;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #5f0080;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        .progress-text {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="status">데이터 처리중입니다...</div>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">0%</div>
+
+    <script>
+        const payload = {
+            year: #(year),
+            assignee: "#(assignee)",
+            email: "#(email)",
+            token: "#(token)",
+            spaceKey: "#(spaceKey)"
+        };
+
+        function updateProgress(percent) {
+            const bar = document.getElementById('progressBar');
+            const text = document.getElementById('progressText');
+            bar.style.width = percent + '%';
+            text.innerText = Math.floor(percent) + '%';
+        }
+
+        // 가짜 프로그레스 애니메이션 (최대 95%까지 천천히 증가)
+        let currentProgress = 0;
+        const progressInterval = setInterval(() => {
+            if (currentProgress >= 95) {
+                // 95%에서 멈춤 (응답 대기)
+            } else {
+                // 초반에는 빠르고 나중에는 느리게
+                const increment = (95 - currentProgress) * 0.05;
+                currentProgress += Math.max(0.5, increment);
+                updateProgress(currentProgress);
+            }
+        }, 200);
+
+        async function fetchReport() {
+            try {
+                const response = await fetch('/moa/api/report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || '리포트 생성 실패');
+                }
+
+                // 완료 시 100% 채우기
+                clearInterval(progressInterval);
+                updateProgress(100);
+
+                const html = await response.text();
+                
+                // 잠시 100%를 보여준 뒤 화면 전환
+                setTimeout(() => {
+                    document.open();
+                    document.write(html);
+                    document.close();
+                }, 300);
+                
+            } catch (error) {
+                clearInterval(progressInterval);
+                document.body.innerHTML = `
+                    <div style="text-align:center; color:#333;">
+                        <h3 style="color: #d00;">오류가 발생했습니다</h3>
+                        <p>${error.message}</p>
+                        <button onclick="location.href='/'" style="padding: 10px 20px; background: #5f0080; color: white; border: none; border-radius: 6px; cursor: pointer;">홈으로 돌아가기</button>
+                    </div>
+                `;
+            }
+        }
+
+        // 페이지 로드 후 실행
+        fetchReport();
+    </script>
+</body>
+</html>
