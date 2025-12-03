@@ -170,20 +170,90 @@ struct ReportGenerator {
             ))
         }
         
-        // [Modified] 에픽별/버전별 보기 비활성화
-        // // 공통: 프로젝트별 그룹화 (기존 로직 유지)
-        // let issuesByProject = Dictionary(grouping: issues) { $0.projectKey }
-        // let sortedProjectKeys = issuesByProject.keys.sorted()
-        // 
-        // // 4. 에픽별 보기 데이터 생성
-        // let projects = sortedProjectKeys.map { pKey -> ProjectGroup in
-        //     ...
-        // }
-        // 
-        // // 5. 버전별 보기 데이터 생성
-        // let versionProjects = sortedProjectKeys.map { pKey -> ProjectGroup in
-        //     ...
-        // }
+        // 5. 에픽별 보기 데이터 생성 (Projects)
+        let issuesByProject = Dictionary(grouping: displayIssues) { $0.projectKey }
+        let sortedProjectKeys = issuesByProject.keys.sorted()
+        
+        let projects = sortedProjectKeys.map { pKey -> ProjectGroup in
+            let projectIssues = issuesByProject[pKey] ?? []
+            
+            // Group by Parent (Epic or Story)
+            var epicGroups: [String: [ProcessedIssue]] = [:]
+            var epicSummaries: [String: String] = [:]
+            
+            for issue in projectIssues {
+                if let pKey = issue.parentKey {
+                    epicGroups[pKey, default: []].append(issue)
+                    if let pSummary = issue.parentSummary {
+                        epicSummaries[pKey] = pSummary
+                    }
+                } else {
+                    epicGroups["No Epic", default: []].append(issue)
+                }
+            }
+            
+            let sortedEpicKeys = epicGroups.keys.sorted { k1, k2 in
+                if k1 == "No Epic" { return false }
+                if k2 == "No Epic" { return true }
+                return k1 < k2
+            }
+            
+            let subGroups = sortedEpicKeys.map { eKey -> SubGroup in
+                let issuesInEpic = epicGroups[eKey] ?? []
+                let title = eKey == "No Epic" ? "에픽 없음" : (epicSummaries[eKey] ?? eKey)
+                let link = eKey == "No Epic" ? nil : "\(issuesInEpic.first?.link.components(separatedBy: "/browse/").first ?? "")/browse/\(eKey)"
+                
+                let roots = buildIssueTree(issues: issuesInEpic)
+                
+                return SubGroup(
+                    title: title,
+                    key: eKey == "No Epic" ? nil : eKey,
+                    link: link,
+                    roots: roots,
+                    isVersion: false,
+                    count: issuesInEpic.count
+                )
+            }
+            
+            return ProjectGroup(name: pKey, groups: subGroups)
+        }
+        
+        // 6. 버전별 보기 데이터 생성 (VersionProjects)
+        let versionProjects = sortedProjectKeys.map { pKey -> ProjectGroup in
+            let projectIssues = issuesByProject[pKey] ?? []
+            
+            var versionGroups: [String: [ProcessedIssue]] = [:]
+            
+            for issue in projectIssues {
+                if let v = issue.versions.first {
+                    versionGroups[v.name, default: []].append(issue)
+                } else {
+                    versionGroups["No Version", default: []].append(issue)
+                }
+            }
+            
+            let sortedVersionNames = versionGroups.keys.sorted { v1, v2 in
+                if v1 == "No Version" { return false }
+                if v2 == "No Version" { return true }
+                return v1 > v2
+            }
+            
+            let subGroups = sortedVersionNames.map { vName -> SubGroup in
+                let issuesInVersion = versionGroups[vName] ?? []
+                let roots = buildIssueTree(issues: issuesInVersion)
+                
+                return SubGroup(
+                    title: vName,
+                    key: nil,
+                    link: nil,
+                    roots: roots,
+                    isVersion: true,
+                    count: issuesInVersion.count
+                )
+            }
+            
+            return ProjectGroup(name: pKey, groups: subGroups)
+        }
         
         return ReportContext(
             year: year,
@@ -194,8 +264,8 @@ struct ReportGenerator {
             platform: platform,
             monthlyStats: monthlyStats,
             topLabels: topLabels,
-            projects: [], // [Modified] 에픽별 보기 비활성화
-            versionProjects: [] // [Modified] 버전별 보기 비활성화
+            projects: projects,
+            versionProjects: versionProjects
         )
     }
     

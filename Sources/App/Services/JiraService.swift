@@ -25,105 +25,26 @@ struct JiraService {
         }
         
         // 1. 먼저 사용자가 활동한 프로젝트를 찾기 위해 광범위한 검색 수행
+        // [Modified] 모든 내 이슈를 먼저 수집 (Sub-task 포함)
         let assigneeClause = assignee != nil ? "assignee = \"\(assignee!)\"" : "assignee = currentUser()"
-        let discoveryJql = """
+        let jql = """
         \(assigneeClause) 
         AND project not in (KQA) 
         AND (created >= \(year)-01-01 OR resolutiondate >= \(year)-01-01)
         """
         
-        // 2. 1차 검색 실행 (프로젝트 식별용)
-        let discoveryIssues = try await executeJqlSearch(jql: discoveryJql, platform: platform)
+        // 2. 이슈 수집 실행
+        var myIssues = try await executeJqlSearch(jql: jql, platform: platform)
         
-        // 3. 식별된 프로젝트들의 해당 연도 릴리즈 버전 조회
-        var projectKeys = Set(discoveryIssues.map { $0.projectKey })
-        if projectKeys.isEmpty {
-             projectKeys.insert("KMA")
-        }
-        var targetVersionIds: [String] = []
-        
-        for projectKey in projectKeys {
-            let versions = try await apiClient.fetchProjectVersions(projectKey: projectKey)
-            let targetVersions = versions.filter { version in
-                guard version.released, let dateStr = version.releaseDate else { return false }
-                return dateStr.hasPrefix("\(year)")
-            }
-            targetVersionIds.append(contentsOf: targetVersions.map { $0.id })
+        // 3. 내 이슈로 마킹
+        for i in 0..<myIssues.count {
+            myIssues[i].isMyTicket = true
         }
         
-        // 4. 해당 버전들에 포함된 이슈 추가 검색 (2-Pass Strategy)
-        var finalIssues: [ProcessedIssue] = []
-        
-        if !targetVersionIds.isEmpty {
-            let chunkSize = 30
-            let chunks = stride(from: 0, to: targetVersionIds.count, by: chunkSize).map {
-                Array(targetVersionIds[$0..<min($0 + chunkSize, targetVersionIds.count)])
-            }
-            
-            for chunk in chunks {
-                let versionIdsStr = chunk.joined(separator: ",")
-                
-                // Pass 1: 버전 내 *모든* 이슈 조회
-                let versionJql = "fixVersion in (\(versionIdsStr))"
-                let versionIssues = try await executeJqlSearch(jql: versionJql, platform: platform)
-                
-                // Pass 2: 내 하위 작업 조회
-                let versionIssueKeys = versionIssues.map { $0.key }
-                var mySubtasksMap: [String: [ProcessedIssue]] = [:]
-                
-                if !versionIssueKeys.isEmpty {
-                    let keyChunkSize = 50
-                    let keyChunks = stride(from: 0, to: versionIssueKeys.count, by: keyChunkSize).map {
-                        Array(versionIssueKeys[$0..<min($0 + keyChunkSize, versionIssueKeys.count)])
-                    }
-                    
-                    for keyChunk in keyChunks {
-                        let keysStr = keyChunk.joined(separator: ",")
-                        // assigneeClause 사용 (currentUser() 또는 특정 사용자)
-                        let subtaskJql = "parent in (\(keysStr)) AND \(assigneeClause)"
-                        
-                        let subtasks = try await executeJqlSearch(jql: subtaskJql, platform: platform)
-                        for sub in subtasks {
-                            if let pKey = sub.parentKey {
-                                mySubtasksMap[pKey, default: []].append(sub)
-                            }
-                        }
-                    }
-                }
-                
-                // 필터링 및 병합
-                for issue in versionIssues {
-                    let isAssignedToMe: Bool
-                    if let targetAssignee = assignee {
-                        // 이름으로 비교 (정확하지 않을 수 있음)
-                        isAssignedToMe = issue.assigneeName == targetAssignee
-                    } else {
-                        // AccountId로 비교 (정확함)
-                        isAssignedToMe = (myAccountId != nil && issue.assigneeAccountId == myAccountId)
-                    }
-                    
-                    let hasMySubtasks = (mySubtasksMap[issue.key]?.count ?? 0) > 0
-                    
-                    if isAssignedToMe || hasMySubtasks {
-                        var processedIssue = issue
-                        processedIssue.isMyTicket = isAssignedToMe
-                        finalIssues.append(processedIssue)
-                    }
-                }
-            }
-        }
-        
-        // 중복 제거
-        let uniqueIssues = Array(Set(finalIssues.map { $0.key })).compactMap { key in
-            finalIssues.first { $0.key == key }
-        }
-        
-        // 5. 버전 정보 재매핑
-        // resolveVersionsRecursively에서 isMyTicket 정보가 유실되지 않도록 주의해야 함
-        // 하지만 resolveVersionsRecursively는 새로운 ProcessedIssue를 생성하지 않고 기존 것을 매핑하거나 부모를 추가함.
-        // 부모를 추가할 때 부모의 isMyTicket은 기본값(false)일 것임. (부모가 내 것이 아닐 수 있으므로 OK)
-        // 기존 이슈는 그대로 유지되므로 isMyTicket도 유지됨.
-        return try await resolveVersionsRecursively(issues: uniqueIssues, platform: platform)
+        // 4. 재귀적 버전 조회 (부모 이슈 조회 포함)
+        // resolveVersionsRecursively는 필요한 부모 이슈를 추가로 fetch하여 리스트에 포함시킴
+        // 이때 추가된 부모 이슈는 isMyTicket이 false(기본값)일 것임 -> OK
+        return try await resolveVersionsRecursively(issues: myIssues, platform: platform)
     }
     
     struct Myself: Decodable {
