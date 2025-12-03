@@ -134,6 +134,20 @@ struct MoaController: RouteCollection {
     private func generateYearlyReportHtml(context: ReportContext) -> String {
         var html = """
         <p>Moa에서 생성된 연간 평가 초안입니다.</p>
+        """
+        
+        // 요약 정보 추가
+        html += """
+        <h3>📊 요약</h3>
+        <ul>
+            <li><strong>총 티켓 수:</strong> \(context.totalCount)개</li>
+            <li><strong>작업 유형별:</strong> 
+        """
+        
+        let typeSummary = context.typeCounts.map { "\($0.type) \($0.count)개" }.joined(separator: ", ")
+        html += "\(typeSummary)</li></ul>"
+        
+        html += """
         <table data-layout="default" ac:local-id="12345678-abcd-1234-abcd-1234567890ab">
             <colgroup>
                 <col style="width: 33.33%;" />
