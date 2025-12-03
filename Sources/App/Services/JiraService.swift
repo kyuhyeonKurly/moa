@@ -116,8 +116,11 @@ struct JiraService {
                     parentSummary = parent.fields.summary
                 }
                 
+                // 이슈 타입 매핑
                 var issueType = issue.fields.issuetype.name
-                if issueType == "Service Request with Approvals" { issueType = "BI 요청" }
+                if issueType == "Service Request with Approvals" { issueType = "외부 요청" }
+                
+                // 상태 매핑
                 let typeClass = self.getTypeClass(for: issueType)
                 
                 return ProcessedIssue(

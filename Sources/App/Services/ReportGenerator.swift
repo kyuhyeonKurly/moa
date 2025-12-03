@@ -307,7 +307,7 @@ struct ReportGenerator {
             "Design", "디자인",
             "Task", "작업",
             "Sub-task", "하위 작업",
-            "BI 요청"
+            "외부 요청"
         ]
         return order.firstIndex(of: type) ?? 999
     }
