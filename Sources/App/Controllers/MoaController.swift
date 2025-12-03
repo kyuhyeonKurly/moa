@@ -107,6 +107,10 @@ struct MoaController: RouteCollection {
         
         // 2. 데이터 다시 조회
         let jiraClient = JiraAPIClient(client: req.client, email: email, token: token)
+        
+        // 사용자 정보 조회 (이름 포함)
+        let user = try await jiraClient.getMyself()
+        
         let jiraService = JiraService(apiClient: jiraClient)
         let issues = try await jiraService.fetchIssues(year: year, platform: platform)
         
@@ -114,8 +118,8 @@ struct MoaController: RouteCollection {
         let context = ReportGenerator.generateContext(issues: issues, year: year, spaceKey: spaceKey, platform: platform)
         
         // 4. HTML 테이블 생성 (연간 평가 템플릿 스타일)
-        let tableHtml = generateYearlyReportHtml(context: context)
-        let title = "\(year)년 연간 평가 (Draft)"
+        let tableHtml = generateYearlyReportHtml(context: context, year: year, userName: user.displayName)
+        let title = "Jira 티켓으로 돌아보는 \(year)년 (\(user.displayName))"
         
         // 5. Confluence API 호출
         let confluenceService = ConfluenceService(client: req.client)
@@ -131,9 +135,61 @@ struct MoaController: RouteCollection {
         return req.redirect(to: editUrl)
     }
     
-    private func generateYearlyReportHtml(context: ReportContext) -> String {
+    private func generateYearlyReportHtml(context: ReportContext, year: Int, userName: String) -> String {
         var html = """
-        <p>Moa에서 생성된 연간 평가 초안입니다.</p>
+        <p>Jira 티켓으로 돌아보는 \(year)년 (\(userName))</p>
+        """
+        
+        // 0. 회고 (Self Review) 섹션 추가
+        html += """
+        <h2>🚀 \(year)년 회고 (Self Review)</h2>
+        <p><em>한 해를 돌아보며 아래 내용을 자유롭게 작성해보세요.</em></p>
+        
+        <table data-layout="default">
+            <colgroup>
+                <col style="width: 50%;" />
+                <col style="width: 50%;" />
+            </colgroup>
+            <tbody>
+                <tr>
+                    <th style="background-color: #E3FCEF;"><strong>👍 잘한 점 (Highlights)</strong></th>
+                    <th style="background-color: #FFEBE6;"><strong>🤔 아쉬운 점 (Lowlights)</strong></th>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top; height: 150px;">
+                        <ul>
+                            <li>성과 1</li>
+                            <li>성과 2</li>
+                        </ul>
+                    </td>
+                    <td style="vertical-align: top; height: 150px;">
+                        <ul>
+                            <li>아쉬운 점 1</li>
+                            <li>개선할 점 2</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th style="background-color: #DEEBFF;"><strong>💡 배운 점 (Learnings)</strong></th>
+                    <th style="background-color: #EAE6FF;"><strong>🎯 내년 목표 (Next Year Goals)</strong></th>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top; height: 150px;">
+                        <ul>
+                            <li>배운 기술/지식</li>
+                            <li>깨달은 점</li>
+                        </ul>
+                    </td>
+                    <td style="vertical-align: top; height: 150px;">
+                        <ul>
+                            <li>목표 1</li>
+                            <li>목표 2</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
         """
         
         // 요약 정보 추가
@@ -146,6 +202,14 @@ struct MoaController: RouteCollection {
         
         let typeSummary = context.typeCounts.map { "\($0.type) \($0.count)개" }.joined(separator: ", ")
         html += "\(typeSummary)</li></ul>"
+        
+        // 안내 문구 추가
+        html += """
+        <p style="color: #6B778C; font-size: 0.9em;">
+            ※ 이 리포트는 <strong>릴리스된 티켓</strong> 중 <strong>최상위 유형(Epic 등)</strong>을 기준으로 정리되었습니다.<br/>
+            (Sub-task나 하위 Story는 부모 티켓에 포함되어 계산됩니다.)
+        </p>
+        """
         
         html += """
         <table data-layout="default" ac:local-id="12345678-abcd-1234-abcd-1234567890ab">
@@ -182,7 +246,12 @@ struct MoaController: RouteCollection {
                 case 6, 10: color = "#EAE6FF" // Purple
                 default: color = "#F4F5F7" // Grey
                 }
-                html += "<th style='background-color: \(color); text-align: left;'><strong>\(m)월</strong></th>"
+                
+                // 월별 티켓 수 계산
+                let count = context.monthlyGrid.first(where: { $0.monthIndex == m })?.issues.count ?? 0
+                let countText = count > 0 ? " (\(count))" : ""
+                
+                html += "<th style='background-color: \(color); text-align: left;'><strong>\(m)월\(countText)</strong></th>"
             }
             html += "</tr>"
             

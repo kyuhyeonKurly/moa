@@ -92,3 +92,8 @@ struct VersionInfo: Content, Hashable {
     let name: String
     let releaseDate: Date?
 }
+
+struct JiraUser: Content {
+    let accountId: String
+    let displayName: String
+}

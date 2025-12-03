@@ -242,7 +242,7 @@
         <input type="hidden" name="spaceKey" value="#(spaceKey)">
         <input type="hidden" name="platform" value="#(platform)">
         <button type="submit" style="padding: 10px 20px; background-color: #0052cc; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            📝 위키에 '연간 평가' 초안 생성하기
+            📝 위키에 'Jira 티켓으로 돌아보는' 초안 생성하기
         </button>
     </form>
     #endif

@@ -15,6 +15,17 @@ final class JiraAPIClient {
         ]
     }
 
+    func getMyself() async throws -> JiraUser {
+        let uri = URI(string: "\(apiBaseURL)/rest/api/3/myself")
+        let response = try await client.get(uri, headers: headers)
+        
+        guard response.status == .ok else {
+            throw Abort(.unauthorized, reason: "Failed to fetch user info. Status: \(response.status)")
+        }
+        
+        return try response.content.decode(JiraUser.self)
+    }
+
     func fetchProjectVersions(projectKey: String) async throws -> [JiraProjectVersion] {
         let uri = URI(string: "\(apiBaseURL)/rest/api/3/project/\(projectKey)/versions")
         print("[Debug] Fetching versions for project: '\(projectKey)'")
