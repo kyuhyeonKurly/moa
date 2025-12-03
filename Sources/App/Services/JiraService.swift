@@ -105,7 +105,9 @@ struct JiraService {
                     let hasMySubtasks = (mySubtasksMap[issue.key]?.count ?? 0) > 0
                     
                     if isAssignedToMe || hasMySubtasks {
-                        finalIssues.append(issue)
+                        var processedIssue = issue
+                        processedIssue.isMyTicket = isAssignedToMe
+                        finalIssues.append(processedIssue)
                     }
                 }
             }
@@ -117,6 +119,10 @@ struct JiraService {
         }
         
         // 5. 버전 정보 재매핑
+        // resolveVersionsRecursively에서 isMyTicket 정보가 유실되지 않도록 주의해야 함
+        // 하지만 resolveVersionsRecursively는 새로운 ProcessedIssue를 생성하지 않고 기존 것을 매핑하거나 부모를 추가함.
+        // 부모를 추가할 때 부모의 isMyTicket은 기본값(false)일 것임. (부모가 내 것이 아닐 수 있으므로 OK)
+        // 기존 이슈는 그대로 유지되므로 isMyTicket도 유지됨.
         return try await resolveVersionsRecursively(issues: uniqueIssues, platform: platform)
     }
     
@@ -276,7 +282,8 @@ struct JiraService {
                     typeClass: issue.typeClass,
                     releaseDate: releaseDateMap[issue.key] ?? nil,
                     assigneeAccountId: issue.assigneeAccountId,
-                    assigneeName: issue.assigneeName
+                    assigneeName: issue.assigneeName,
+                    isMyTicket: issue.isMyTicket // 기존 값 유지
                 )
             }
             return issue

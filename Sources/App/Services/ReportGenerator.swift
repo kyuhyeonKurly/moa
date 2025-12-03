@@ -10,12 +10,18 @@ struct ReportContext: Encodable {
     
     // 기존 필드 (하위 호환성 유지)
     let monthlyStats: [MonthlyStat]
+    let topLabels: [LabelCountItem] // Added topLabels
     let projects: [ProjectGroup]
     let versionProjects: [ProjectGroup]
 }
 
 struct TypeCountItem: Encodable {
     let type: String
+    let count: Int
+}
+
+struct LabelCountItem: Encodable {
+    let label: String
     let count: Int
 }
 
@@ -73,14 +79,49 @@ struct ReportGenerator {
                     typeClass: issue.typeClass,
                     releaseDate: issue.releaseDate,
                     assigneeAccountId: issue.assigneeAccountId,
-                    assigneeName: issue.assigneeName
+                    assigneeName: issue.assigneeName,
+                    isMyTicket: issue.isMyTicket
                 )
             }
         } else {
             displayIssues = issues
         }
 
-        // 1. 월별 통계 (Release Date 기준)
+        // 1. 통계 계산 (Total Count & Type Counts)
+        // 조건: isMyTicket == true 인 것만 카운트
+        let myTickets = displayIssues.filter { $0.isMyTicket }
+        let totalCount = myTickets.count
+        
+        var typeCountsDict: [String: Int] = [:]
+        for issue in myTickets {
+            typeCountsDict[issue.issueType, default: 0] += 1
+        }
+        
+        let typeCounts = typeCountsDict.map { key, value in
+            TypeCountItem(type: key, count: value)
+        }.sorted { item1, item2 in
+            let p1 = getTypePriority(item1.type)
+            let p2 = getTypePriority(item2.type)
+            
+            if p1 != p2 {
+                return p1 < p2
+            } else {
+                return item1.count > item2.count
+            }
+        }
+        
+        // 3. 상위 라벨 통계 (Top 5)
+        var labelCountsDict: [String: Int] = [:]
+        for issue in myTickets {
+            for label in issue.labels {
+                labelCountsDict[label, default: 0] += 1
+            }
+        }
+        let topLabels = labelCountsDict.map { key, value in
+            LabelCountItem(label: key, count: value)
+        }.sorted { $0.count > $1.count }.prefix(5).map { $0 }
+
+        // 4. 월별 통계 (Release Date 기준)
         let calendar = Calendar.current
         let issuesByMonth = Dictionary(grouping: displayIssues) { issue in
             if let releaseDate = issue.releaseDate {
@@ -89,32 +130,9 @@ struct ReportGenerator {
             return calendar.component(.month, from: issue.createdDate)
         }
         
-        // [Modified] 통계 비활성화
-        // let monthlyStats = issuesByMonth.keys.sorted().map { month in
-        //     MonthlyStat(month: month, count: issuesByMonth[month]?.count ?? 0)
-        // }
-        let monthlyStats: [MonthlyStat] = []
-        
-        // 2. 타입별 카운트
-        // [Modified] 타입별 요약 비활성화
-        // var typeCountsDict: [String: Int] = [:]
-        // for issue in issues {
-        //     typeCountsDict[issue.issueType, default: 0] += 1
-        // }
-        // 
-        // let typeCounts = typeCountsDict.map { key, value in
-        //     TypeCountItem(type: key, count: value)
-        // }.sorted { item1, item2 in
-        //     let p1 = getTypePriority(item1.type)
-        //     let p2 = getTypePriority(item2.type)
-        //     
-        //     if p1 != p2 {
-        //         return p1 < p2
-        //     } else {
-        //         return item1.count > item2.count
-        //     }
-        // }
-        let typeCounts: [TypeCountItem] = []
+        let monthlyStats = issuesByMonth.keys.sorted().map { month in
+            MonthlyStat(month: month, count: issuesByMonth[month]?.count ?? 0)
+        }
         
         // 3. 월별 그리드 (1월 ~ 12월)
         // 조건: 버전이 있고, 서브태스크가 아닌 최상위 티켓만 표시
@@ -169,12 +187,13 @@ struct ReportGenerator {
         
         return ReportContext(
             year: year,
-            totalCount: 0, // [Modified] 총 티켓 수 비활성화
+            totalCount: totalCount,
             typeCounts: typeCounts,
             monthlyGrid: monthlyGrid,
             spaceKey: spaceKey,
             platform: platform,
             monthlyStats: monthlyStats,
+            topLabels: topLabels,
             projects: [], // [Modified] 에픽별 보기 비활성화
             versionProjects: [] // [Modified] 버전별 보기 비활성화
         )

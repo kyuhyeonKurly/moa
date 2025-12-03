@@ -78,6 +78,7 @@ struct ProcessedIssue: Content {
     let releaseDate: Date?
     let assigneeAccountId: String? // 추가
     let assigneeName: String? // 추가
+    var isMyTicket: Bool = false // 내 티켓 여부 (통계용)
 }
 
 struct VersionInfo: Content, Hashable {
