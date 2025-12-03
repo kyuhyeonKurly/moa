@@ -74,6 +74,9 @@ struct ReportGenerator {
                     projectKey: issue.projectKey,
                     parentKey: issue.parentKey,
                     parentSummary: issue.parentSummary,
+                    parentType: issue.parentType,
+                    displayParentKey: issue.displayParentKey,
+                    displayParentSummary: issue.displayParentSummary,
                     issueType: issue.issueType,
                     isSubtask: issue.isSubtask,
                     typeClass: issue.typeClass,
@@ -141,9 +144,57 @@ struct ReportGenerator {
         
         for i in 1...12 {
             let monthIssues = issuesByMonth[i] ?? []
-            let filteredIssues = monthIssues.filter { issue in
+            
+            // 1. Subtask -> Parent 매핑 및 중복 제거
+            var uniqueIssues: [String: ProcessedIssue] = [:]
+            
+            for issue in monthIssues {
+                // Use displayParentKey (Root) if available, otherwise parentKey
+                let targetPKey = issue.displayParentKey ?? issue.parentKey
+                let targetPSummary = issue.displayParentSummary ?? issue.parentSummary
+
+                if let pKey = targetPKey, let pSummary = targetPSummary {
+                    // 부모 티켓이 이미 맵에 존재하면(실제 티켓), 덮어쓰지 않음 (실제 티켓 정보가 더 정확함)
+                    // 부모 티켓이 없으면, Proxy Parent 생성
+                    if uniqueIssues[pKey] == nil {
+                        let pType = issue.parentType ?? "Story"
+                        let pTypeClass = getTypeClass(for: pType)
+                        
+                        let parentIssue = ProcessedIssue(
+                            key: pKey,
+                            summary: pSummary,
+                            createdDate: issue.createdDate, // Fallback
+                            labels: [],
+                            versions: issue.versions, // 상속된 버전 사용
+                            link: "https://kurly0521.atlassian.net/browse/\(pKey)",
+                            projectKey: issue.projectKey,
+                            parentKey: nil,
+                            parentSummary: nil,
+                            parentType: nil,
+                            displayParentKey: nil,
+                            displayParentSummary: nil,
+                            issueType: pType,
+                            isSubtask: false,
+                            typeClass: pTypeClass,
+                            releaseDate: issue.releaseDate,
+                            assigneeAccountId: nil,
+                            assigneeName: nil,
+                            isMyTicket: false // 통계에는 포함되지 않음 (화면 표시용)
+                        )
+                        uniqueIssues[pKey] = parentIssue
+                    }
+                } else {
+                    // 서브태스크가 아닌 경우 (Epic, Story, Task, Bug 등)
+                    // 이미 Proxy가 있더라도 실제 티켓 정보로 덮어씀
+                    uniqueIssues[issue.key] = issue
+                }
+            }
+            
+            let filteredIssues = uniqueIssues.values.filter { issue in
                 !issue.versions.isEmpty && 
                 !issue.isSubtask &&
+                issue.issueType != "Sub-task" &&
+                issue.issueType != "하위 작업" &&
                 !issue.versions.contains { v in 
                     v.name.contains("버전할당 대기") || v.name.contains("버전 할당 대기")
                 }
@@ -310,5 +361,17 @@ struct ReportGenerator {
             "외부 요청"
         ]
         return order.firstIndex(of: type) ?? 999
+    }
+    
+    private static func getTypeClass(for typeName: String) -> String {
+        switch typeName {
+        case "Epic", "에픽": return "type-epic"
+        case "Story", "스토리": return "type-story"
+        case "Task", "작업": return "type-task"
+        case "Bug", "버그": return "type-bug"
+        case "Improvement", "개선": return "type-improvement"
+        case "Design", "디자인": return "type-design"
+        default: return "type-default"
+        }
     }
 }

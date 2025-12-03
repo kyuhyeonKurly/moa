@@ -111,9 +111,11 @@ struct JiraService {
                 
                 var parentKey: String? = nil
                 var parentSummary: String? = nil
+                var parentType: String? = nil
                 if let parent = issue.fields.parent {
                     parentKey = parent.key
                     parentSummary = parent.fields.summary
+                    parentType = parent.fields.issuetype?.name
                 }
                 
                 // 이슈 타입 매핑
@@ -133,6 +135,9 @@ struct JiraService {
                     projectKey: projectKey,
                     parentKey: parentKey,
                     parentSummary: parentSummary,
+                    parentType: parentType,
+                    displayParentKey: parentKey,
+                    displayParentSummary: parentSummary,
                     issueType: issueType,
                     isSubtask: issue.fields.issuetype.subtask,
                     typeClass: typeClass,
@@ -190,27 +195,43 @@ struct JiraService {
         }
         
         return issues.map { issue in
-            if let v = versionMap[issue.key], !v.isEmpty {
-                return ProcessedIssue(
-                    key: issue.key,
-                    summary: issue.summary,
-                    createdDate: issue.createdDate,
-                    labels: issue.labels,
-                    versions: v,
-                    link: issue.link,
-                    projectKey: issue.projectKey,
-                    parentKey: issue.parentKey,
-                    parentSummary: issue.parentSummary,
-                    issueType: issue.issueType,
-                    isSubtask: issue.isSubtask,
-                    typeClass: issue.typeClass,
-                    releaseDate: releaseDateMap[issue.key] ?? nil,
-                    assigneeAccountId: issue.assigneeAccountId,
-                    assigneeName: issue.assigneeName,
-                    isMyTicket: issue.isMyTicket // 기존 값 유지
-                )
+            // Find Root Parent (Display Parent)
+            var currentKey = issue.key
+            var visited = Set<String>()
+            while let pKey = parentMap[currentKey] ?? nil, !visited.contains(pKey) {
+                visited.insert(currentKey)
+                currentKey = pKey
             }
-            return issue
+            let rootKey = currentKey
+            let rootIssue = issueMap[rootKey]
+            
+            let finalDisplayParentKey = (rootKey != issue.key) ? rootKey : nil
+            let finalDisplayParentSummary = (rootKey != issue.key) ? rootIssue?.summary : nil
+            
+            let finalVersions = (versionMap[issue.key]?.isEmpty == false) ? versionMap[issue.key]! : issue.versions
+            let finalReleaseDate = releaseDateMap[issue.key] ?? issue.releaseDate
+
+            return ProcessedIssue(
+                key: issue.key,
+                summary: issue.summary,
+                createdDate: issue.createdDate,
+                labels: issue.labels,
+                versions: finalVersions,
+                link: issue.link,
+                projectKey: issue.projectKey,
+                parentKey: issue.parentKey,
+                parentSummary: issue.parentSummary,
+                parentType: issue.parentType,
+                displayParentKey: finalDisplayParentKey,
+                displayParentSummary: finalDisplayParentSummary,
+                issueType: issue.issueType,
+                isSubtask: issue.isSubtask,
+                typeClass: issue.typeClass,
+                releaseDate: finalReleaseDate,
+                assigneeAccountId: issue.assigneeAccountId,
+                assigneeName: issue.assigneeName,
+                isMyTicket: issue.isMyTicket
+            )
         }
     }
     

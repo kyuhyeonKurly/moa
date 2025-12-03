@@ -42,6 +42,7 @@ struct JiraFields: Content {
     }
     struct JiraParentFields: Content {
         let summary: String
+        let issuetype: JiraIssueType?
     }
     struct JiraAssignee: Content { // 추가
         let accountId: String
@@ -70,6 +71,11 @@ struct ProcessedIssue: Content {
     let projectKey: String
     let parentKey: String?   // 바로 위 부모 (Epic, Story, Task 등)
     let parentSummary: String?
+    let parentType: String?
+    
+    // 계층 구조 표시용 (Subtask -> Story -> Epic 인 경우 Epic 정보)
+    var displayParentKey: String?
+    var displayParentSummary: String?
     
     // 추가된 필드
     let issueType: String
