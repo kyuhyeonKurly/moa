@@ -1,77 +1,102 @@
-# Moa 프로젝트 지침 (Moa Project Instructions)
+# Copilot Constitution & Vapor 4 Master Guidelines
 
-## 프로젝트 개요
+> **CRITICAL INSTRUCTION**: This project follows **Spec-Driven Development**.
+> Before writing any code, you MUST check the `specs/` directory for the relevant specification file.
+> - `specs/000_system_overview.md`: Core system logic and legacy context.
+> - `specs/001_*.md`: Feature-specific specifications.
+>
+> If a spec does not exist for the requested feature, ask the user to create one or create it yourself before proceeding.
 
-Moa는 Jira 이슈를 수집하여 에픽(Epic) 및 버전(Version)별로 정리된 연말 회고 리포트를 생성하는 Swift Vapor 애플리케이션입니다.
+---
 
-## 아키텍처
+# Vapor 4 Framework & Ecosystem Master Guidelines
 
-- **프레임워크**: Vapor 4.0 (Swift 6.2.1+)
-- **패턴**: 강력한 서비스 계층(Service Layer)을 갖춘 MVC 패턴.
-- **주요 컴포넌트**:
-  - **Controllers**: `MoaController`는 웹 라우트(`/`, `/moa/*`)를 처리합니다.
-  - **Services**: 
-    - `JiraService`: 이슈 수집, JQL 실행, 재귀적 버전 조회 핵심 로직 담당.
-    - `ConfluenceService`: Confluence 페이지 생성 처리.
-    - `ReportGenerator`: 수집된 데이터를 포맷팅.
-  - **Commands**: 웹 UI 없이 로직을 테스트하기 위한 커스텀 CLI 명령어(`JiraVersionsCommand`) (`Sources/App/Commands`).
-  - **Views**: `Resources/Views`에 위치한 Leaf 템플릿(`.leaf`).
+You are an expert Server-side Swift developer specializing in Vapor 4. You must strictly adhere to the following architectural patterns, coding standards, and security best practices defined below.
 
-## 핵심 비즈니스 로직 (Jira 데이터 처리)
+## 1. Project Directory Structure
+Maintain this strict folder hierarchy. Do not place files randomly.
 
-AI 에이전트는 코드를 수정할 때 반드시 아래의 **데이터 처리 순서**를 준수해야 합니다.
+```
+.
+├── Package.swift               # Dependencies manifest
+├── Public                      # Static assets (Served directly to browser via FileMiddleware)
+│   ├── images                  # Image files (Logo, Icons, Banners - png/jpg/svg)
+│   ├── styles                  # CSS stylesheets (Design, Layout, Fonts)
+│   └── scripts                 # Client-side JavaScript (ONLY for light interactions or Alpine.js)
+├── Resources
+│   └── Views                   # Leaf templates (Server-side rendered HTML)
+└── Sources
+    └── App
+        ├── Controllers         # RouteCollections (Request logic & Response handling)
+        ├── DTOs                # Data Transfer Objects (Strictly typed JSON structs)
+        ├── Models              # Fluent Models (Database Tables & Schemas)
+        ├── Migrations          # Database Schema Version Control
+        ├── Services            # Business Logic, External API Clients
+        ├── Middleware          # Custom Request/Response Interceptors
+        ├── Commands            # Custom CLI Tools (e.g., Admin tasks)
+        ├── Jobs                # Queue Workers (Background tasks like Emails)
+        ├── configure.swift     # Application Setup (DB, Middleware, Services)
+        ├── entrypoint.swift    # Application Entry Point (@main)
+        └── routes.swift        # Route Definitions (End-points)
+```
 
-1. **이슈 우선 수집 (Fetch Issues First)**:
-   - JQL을 사용하여 해당 연도의 **모든 내 이슈(Sub-task 포함)**를 먼저 수집합니다.
-   
-2. **재귀적 버전 매핑 (Recursive Version Lookup)**:
-   - 수집된 **모든 이슈**에 대해 올바른 버전을 찾아 매핑합니다.
-   - **Sub-task 처리**: Sub-task는 `fixVersion`이 비어있는 경우가 많으므로, 반드시 **부모(Parent) 이슈**를 조회하여 부모의 버전을 상속받아야 합니다.
-   
-3. **뷰 모델 구성 (View Generation)**:
-   - **총 티켓 수**: 1번 단계에서 수집된 **모든 이슈(Sub-task 포함)**의 개수입니다 (가장 정확한 업무량).
-   - **월별 보기 (Monthly View)**: 
-     - 2번 단계에서 매핑된 버전의 **배포일(Release Date)**을 기준으로 그룹핑합니다.
-     - **계층 구조 표시 방식 (Hierarchy Display)**: 사용자가 작업한 이슈가 Sub-task이거나 Epic의 하위 Story인 경우, **최상위 부모(Root Parent, 주로 Epic)**까지 재귀적으로 조회하여 **최상위 부모 이슈**를 표시해야 합니다. (중간 단계인 Story가 아닌 Epic 단위로 묶어서 보여줌으로써 가독성을 높임).
-     - **필터링**: 버전이 없거나 '버전 할당 대기'인 항목은 제외합니다.
+## 2. Core Principles & Basics
+- **Concurrency**: ALWAYS use Swift's native Concurrency (`async`/`await`). DO NOT use `EventLoopFuture` unless dealing with legacy dependencies.
+- **Error Handling**: Throw `Abort(.status, reason: String)` for HTTP errors.
+- **Logging**: Use `req.logger` (e.g., `req.logger.info("...")`) instead of `print()`.
+- **Environment**: Never hardcode secrets. Use `Environment.get("KEY")` or `.env` files.
 
-## 주요 패턴 및 컨벤션
+## 3. Controllers & Routing
+- **Protocol**: Controllers must conform to `RouteCollection`.
+- **Boot**: Implement `func boot(routes: RoutesBuilder) throws`.
+- **Registration**: ALWAYS suggest registering new controllers in `routes.swift` or `configure.swift` (e.g., `try app.register(collection: MyController())`).
 
-### Jira 연동
+## 4. Content, Validation & DTOs
+- **Strict Separation**: NEVER expose Fluent `Model` classes directly in API responses or Views.
+- **DTOs**: Create structs in `Sources/App/DTOs` conforming to `Content`.
+- **Validation**: Implement `Validatable` on input DTOs and call `req.content.validate(InputDTO.self)` before decoding.
 
-- **API Client**: `JiraAPIClient`를 사용하여 원시 HTTP 요청을 처리합니다.
-- **JQL 구성**: `project not in (KQA)` 및 날짜 필터가 유지되도록 주의하세요.
+## 5. Database (Fluent)
+- **Models**: Conform to `Model`. Use `UUID` for IDs. Use `@Parent`, `@Children`, `@Siblings` for relationships.
+- **Migrations**: Every Model MUST have a corresponding `AsyncMigration`.
+    - Define constraints strictly (`.required`, `.unique`).
+    - Use `.references()` for Foreign Keys to ensure integrity.
+- **Performance**: Use Eager Loading (`.with(\.$relation)`) to prevent N+1 query issues.
+- **Transactions**: Use `req.db.transaction { ... }` for atomic operations.
 
-### 데이터 흐름
+## 6. Leaf Templating
+- **Files**: All templates reside in `Resources/Views`. Extension must be `.leaf`.
+- **Syntax**:
+    - Extend layouts: `#extend("base"): ... #endextend`
+    - Variables: `#(variableName)`
+    - Loops/Conditions: `#for(item in items):`, `#if(condition):`
+- **Context**: Pass data via `ViewContext` structs, not raw Models.
 
-1. **입력**: 사용자가 `index.leaf`를 통해 자격 증명과 파라미터를 제공.
-2. **처리**: `MoaController` -> `JiraService` (위의 비즈니스 로직 수행).
-3. **출력**: `ReportGenerator`가 구조화된 리포트 생성 -> Leaf 렌더링.
+## 7. Frontend Architecture (HTMX & Alpine.js)
+Prefer **HTMX** for server-driven interactions and **Alpine.js** for client-side logic to minimize custom JavaScript.
 
-### 설정
+- **HTMX Usage**:
+    - Use `hx-get`, `hx-post`, `hx-delete` to trigger server actions without full page reloads.
+    - Use `hx-target` and `hx-swap` to update specific DOM elements.
+    - **Response**: Return HTML fragments (partials), NOT JSON. Create small Leaf files (e.g., `_user_row.leaf`) for these fragments.
+- **Alpine.js Usage**:
+    - Use for purely client-side interactivity (toggling modals, dropdowns) where server roundtrip is unnecessary.
+    - Example: `<div x-data="{ open: false }">`
 
-- **환경 변수**: `.env` 파일 사용 (`JIRA_EMAIL`, `JIRA_TOKEN`).
-- **쿠키**: 자격 증명(`moa_email`, `moa_token`) 유지.
+## 8. Redis & Caching (In-Memory DB)
+- **Sessions**: Prefer Redis for session storage in production: `app.sessions.use(.redis)`.
+- **Caching**: Use `req.cache` backed by Redis for high-performance data retrieval.
+- **TTL**: ALWAYS set an expiration time (`expiresIn:`) when caching to manage memory usage.
 
-## 개발 워크플로우
+## 9. Advanced Features
+- **Middleware**: Create custom `AsyncMiddleware` for request interception. Register order matters in `configure.swift`.
+- **Queues**: Use `app.queues` for background tasks (email sending, image processing). Define `Job` structs.
+- **Commands**: Conform to `Command` for custom CLI tools.
+- **WebSockets**: Use `routes.webSocket("path") { req, ws in ... }`.
 
-### 빌드 및 실행
-
-- **서버 실행**: `swift run` (기본 포트: 8080)
-- **명령어 실행**: `swift run App jira-versions`
-- **의존성 관리**: `Package.swift`
-
-### 일반적인 작업
-
-- **새로운 리포트 섹션 추가**:
-  1. `JiraModels.swift` 필드 추가.
-  2. `JiraService` 데이터 매핑 로직 수정.
-  3. `ReportGenerator` 및 `report.leaf` 업데이트.
-
-## 기술 스택 상세
-
-- **언어**: Swift 6.2.1
-- **웹 프레임워크**: Vapor 4.0
-- **템플릿 엔진**: Leaf
-- **동시성**: Swift Concurrency (async/await) 필수 사용.
-- **외부 API**: Jira Cloud REST API v3
+## 10. Security & Authentication
+- **Passwords**: NEVER store plain text passwords. Use `Bcrypt` for hashing (`req.password.hash(password)`).
+- **Authentication**:
+    - Conform User models to `ModelAuthenticatable`.
+    - Use built-in middleware: `User.authenticator()`, `User.guardMiddleware()`.
+- **JWT**: For stateless auth, use `JWTPayload` and `app.jwt.signers`.
