@@ -4,15 +4,24 @@ struct JiraService {
     let apiClient: JiraAPIClient
     
     func fetchIssues(year: Int, assignee: String? = nil, platform: String? = nil) async throws -> [ProcessedIssue] {
-        // 0. 내 정보 가져오기 (AccountId 식별용)
+        print("[Debug] fetchIssues started. Year: \(year), Assignee: \(assignee ?? "nil")")
+
+        // 0. 내 정보 가져오기 (AccountId 식별용 & 토큰 검증)
         var myAccountId: String?
-        if assignee == nil {
-            let myselfUri = URI(string: "\(apiClient.apiBaseURL)/rest/api/3/myself")
-            if let myselfResponse = try? await apiClient.client.get(myselfUri, headers: apiClient.headers),
-               myselfResponse.status == .ok,
-               let myself = try? myselfResponse.content.decode(Myself.self) {
+        let myselfUri = URI(string: "\(apiClient.apiBaseURL)/rest/api/3/myself")
+        do {
+            let myselfResponse = try await apiClient.client.get(myselfUri, headers: apiClient.headers)
+            if myselfResponse.status == .ok {
+                let myself = try myselfResponse.content.decode(Myself.self)
                 myAccountId = myself.accountId
+                print("[Debug] ✅ Auth Success! Logged in as: \(myself.displayName)")
+            } else {
+                print("[Debug] ❌ Auth Failed! Status: \(myselfResponse.status)")
+                throw Abort(.unauthorized, reason: "Jira 인증 실패: 이메일과 토큰을 확인해주세요. (Status: \(myselfResponse.status))")
             }
+        } catch {
+            print("[Debug] ❌ Auth Request Error: \(error)")
+            throw Abort(.unauthorized, reason: "Jira 인증 요청 중 오류 발생: \(error)")
         }
         
         // 1. 먼저 사용자가 활동한 프로젝트를 찾기 위해 광범위한 검색 수행
@@ -27,7 +36,10 @@ struct JiraService {
         let discoveryIssues = try await executeJqlSearch(jql: discoveryJql, platform: platform)
         
         // 3. 식별된 프로젝트들의 해당 연도 릴리즈 버전 조회
-        let projectKeys = Set(discoveryIssues.map { $0.projectKey })
+        var projectKeys = Set(discoveryIssues.map { $0.projectKey })
+        if projectKeys.isEmpty {
+             projectKeys.insert("KMA")
+        }
         var targetVersionIds: [String] = []
         
         for projectKey in projectKeys {
@@ -105,7 +117,7 @@ struct JiraService {
         }
         
         // 5. 버전 정보 재매핑
-        return try await resolveVersionsRecursively(issues: uniqueIssues)
+        return try await resolveVersionsRecursively(issues: uniqueIssues, platform: platform)
     }
     
     struct Myself: Decodable {
@@ -114,6 +126,9 @@ struct JiraService {
     }
     
     private func executeJqlSearch(jql: String, platform: String? = nil) async throws -> [ProcessedIssue] {
+        print("[Debug] executeJqlSearch called. Platform: \(platform ?? "nil")")
+        print("[Debug] JQL: \(jql)")
+        
         var issues: [ProcessedIssue] = []
         var nextPageToken: String? = nil
         let maxResults = 100
@@ -126,6 +141,8 @@ struct JiraService {
                 maxResults: maxResults,
                 nextPageToken: nextPageToken
             )
+            
+            print("[Debug] Search returned \(searchResult.issues.count) issues.")
             
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -149,13 +166,14 @@ struct JiraService {
                 
                 let sortedVersions: [VersionInfo]
                 if let platform = platform, !platform.isEmpty {
-                    sortedVersions = rawVersions.sorted { v1, v2 in
-                        let v1Matches = v1.name.localizedCaseInsensitiveContains(platform)
-                        let v2Matches = v2.name.localizedCaseInsensitiveContains(platform)
-                        if v1Matches && !v2Matches { return true }
-                        if !v1Matches && v2Matches { return false }
-                        return false // Keep original order
+                    print("[Debug] Filtering Issue \(issue.key) for platform: '\(platform)'")
+                    print("[Debug] Raw Versions: \(rawVersions.map { $0.name })")
+                    
+                    sortedVersions = rawVersions.filter { version in
+                        version.name.localizedCaseInsensitiveContains(platform)
                     }
+                    
+                    print("[Debug] Filtered Versions: \(sortedVersions.map { $0.name })")
                 } else {
                     sortedVersions = rawVersions
                 }
@@ -205,7 +223,7 @@ struct JiraService {
         return issues
     }
     
-    private func resolveVersionsRecursively(issues: [ProcessedIssue]) async throws -> [ProcessedIssue] {
+    private func resolveVersionsRecursively(issues: [ProcessedIssue], platform: String? = nil) async throws -> [ProcessedIssue] {
         var issueMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0) })
         var versionMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0.versions) })
         var releaseDateMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0.releaseDate) })
@@ -220,7 +238,7 @@ struct JiraService {
             let missingParentKeys = requiredParentKeys.subtracting(knownKeys)
             
             if !missingParentKeys.isEmpty {
-                let fetchedParents = try await fetchIssuesByKeys(keys: Array(missingParentKeys))
+                let fetchedParents = try await fetchIssuesByKeys(keys: Array(missingParentKeys), platform: platform)
                 for p in fetchedParents {
                     issueMap[p.key] = p
                     versionMap[p.key] = p.versions
@@ -265,10 +283,10 @@ struct JiraService {
         }
     }
     
-    private func fetchIssuesByKeys(keys: [String]) async throws -> [ProcessedIssue] {
+    private func fetchIssuesByKeys(keys: [String], platform: String? = nil) async throws -> [ProcessedIssue] {
         if keys.isEmpty { return [] }
         let jql = "key in (\(keys.joined(separator: ",")))"
-        return try await executeJqlSearch(jql: jql)
+        return try await executeJqlSearch(jql: jql, platform: platform)
     }
     
     private func getTypeClass(for typeName: String) -> String {

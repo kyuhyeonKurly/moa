@@ -6,6 +6,7 @@ struct ReportContext: Encodable {
     let typeCounts: [TypeCountItem]
     let monthlyGrid: [MonthlyGridItem]
     let spaceKey: String? // Added spaceKey
+    let platform: String? // Added platform
     
     // 기존 필드 (하위 호환성 유지)
     let monthlyStats: [MonthlyStat]
@@ -49,10 +50,39 @@ struct IssueNode: Encodable {
 }
 
 struct ReportGenerator {
-    static func generateContext(issues: [ProcessedIssue], year: Int, spaceKey: String? = nil) -> ReportContext {
+    static func generateContext(issues: [ProcessedIssue], year: Int, spaceKey: String? = nil, platform: String? = nil) -> ReportContext {
+        // 0. 플랫폼 필터링 (View용 데이터 가공)
+        let displayIssues: [ProcessedIssue]
+        if let platform = platform, !platform.isEmpty {
+            displayIssues = issues.map { issue in
+                // 해당 플랫폼이 포함된 버전만 남김
+                let filteredVersions = issue.versions.filter { $0.name.contains(platform) }
+                
+                return ProcessedIssue(
+                    key: issue.key,
+                    summary: issue.summary,
+                    createdDate: issue.createdDate,
+                    labels: issue.labels,
+                    versions: filteredVersions,
+                    link: issue.link,
+                    projectKey: issue.projectKey,
+                    parentKey: issue.parentKey,
+                    parentSummary: issue.parentSummary,
+                    issueType: issue.issueType,
+                    isSubtask: issue.isSubtask,
+                    typeClass: issue.typeClass,
+                    releaseDate: issue.releaseDate,
+                    assigneeAccountId: issue.assigneeAccountId,
+                    assigneeName: issue.assigneeName
+                )
+            }
+        } else {
+            displayIssues = issues
+        }
+
         // 1. 월별 통계 (Release Date 기준)
         let calendar = Calendar.current
-        let issuesByMonth = Dictionary(grouping: issues) { issue in
+        let issuesByMonth = Dictionary(grouping: displayIssues) { issue in
             if let releaseDate = issue.releaseDate {
                 return calendar.component(.month, from: releaseDate)
             }
@@ -143,6 +173,7 @@ struct ReportGenerator {
             typeCounts: typeCounts,
             monthlyGrid: monthlyGrid,
             spaceKey: spaceKey,
+            platform: platform,
             monthlyStats: monthlyStats,
             projects: [], // [Modified] 에픽별 보기 비활성화
             versionProjects: [] // [Modified] 버전별 보기 비활성화

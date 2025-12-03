@@ -72,7 +72,8 @@
             assignee: "#(assignee)",
             email: "#(email)",
             token: "#(token)",
-            spaceKey: "#(spaceKey)"
+            spaceKey: "#(spaceKey)",
+            platform: "#(platform)"
         };
 
         function updateProgress(percent) {
@@ -107,7 +108,16 @@
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    throw new Error(errorText || '리포트 생성 실패');
+                    let errorMessage = errorText;
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        if (errorJson.reason) {
+                            errorMessage = errorJson.reason;
+                        }
+                    } catch (e) {
+                        // JSON 파싱 실패 시 원본 텍스트 사용
+                    }
+                    throw new Error(errorMessage || '리포트 생성 실패');
                 }
 
                 // 완료 시 100% 채우기

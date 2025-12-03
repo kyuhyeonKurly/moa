@@ -17,9 +17,17 @@ final class JiraAPIClient {
 
     func fetchProjectVersions(projectKey: String) async throws -> [JiraProjectVersion] {
         let uri = URI(string: "\(apiBaseURL)/rest/api/3/project/\(projectKey)/versions")
+        print("[Debug] Fetching versions for project: '\(projectKey)'")
+        print("[Debug] URI: \(uri.string)")
+        
         let response = try await client.get(uri, headers: headers)
         
+        print("[Debug] Response Status: \(response.status)")
+        
         guard response.status == .ok else {
+            if let body = response.body {
+                print("[Debug] Error Body: \(String(buffer: body))")
+            }
             return []
         }
         

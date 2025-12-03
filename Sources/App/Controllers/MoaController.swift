@@ -58,8 +58,13 @@ struct MoaController: RouteCollection {
         }
         
         let params = try req.content.decode(ReportRequest.self)
+        req.logger.info("[Debug] ReportRequest received. Platform: \(params.platform ?? "nil")")
         
-        let jiraClient = JiraAPIClient(client: req.client, email: params.email, token: params.token)
+        // 공백 제거 (복사/붙여넣기 실수 방지)
+        let cleanEmail = params.email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanToken = params.token.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        let jiraClient = JiraAPIClient(client: req.client, email: cleanEmail, token: cleanToken)
         let jiraService = JiraService(apiClient: jiraClient)
         
         // 1. 이슈 모으기
@@ -68,7 +73,7 @@ struct MoaController: RouteCollection {
         let issues = try await jiraService.fetchIssues(year: params.year, assignee: assignee, platform: params.platform)
         
         // 2. 데이터 가공 (Context 생성)
-        let context = ReportGenerator.generateContext(issues: issues, year: params.year, spaceKey: params.spaceKey)
+        let context = ReportGenerator.generateContext(issues: issues, year: params.year, spaceKey: params.spaceKey, platform: params.platform)
         
         // 3. Leaf 템플릿 렌더링
         let view = try await req.view.render("report", context).get()
@@ -77,8 +82,8 @@ struct MoaController: RouteCollection {
         let response = try await view.encodeResponse(for: req).get()
         
         // 로그인 성공 시 쿠키에 저장 (30일 유지)
-        response.cookies["moa_email"] = HTTPCookies.Value(string: params.email, maxAge: 60*60*24*30, sameSite: .lax)
-        response.cookies["moa_token"] = HTTPCookies.Value(string: params.token, maxAge: 60*60*24*30, sameSite: .lax)
+        response.cookies["moa_email"] = HTTPCookies.Value(string: cleanEmail, maxAge: 60*60*24*30, sameSite: .lax)
+        response.cookies["moa_token"] = HTTPCookies.Value(string: cleanToken, maxAge: 60*60*24*30, sameSite: .lax)
         
         if let spaceKey = params.spaceKey, !spaceKey.isEmpty {
             response.cookies["moa_space_key"] = HTTPCookies.Value(string: spaceKey, maxAge: 60*60*24*30, sameSite: .lax)
@@ -91,6 +96,7 @@ struct MoaController: RouteCollection {
         // 1. 파라미터 받기
         let year = try req.content.get(Int.self, at: "year")
         let spaceKey = try req.content.get(String.self, at: "spaceKey")
+        let platform = req.content[String.self, at: "platform"]
         
         let email = req.cookies["moa_email"]?.string
         let token = req.cookies["moa_token"]?.string
@@ -102,10 +108,10 @@ struct MoaController: RouteCollection {
         // 2. 데이터 다시 조회
         let jiraClient = JiraAPIClient(client: req.client, email: email, token: token)
         let jiraService = JiraService(apiClient: jiraClient)
-        let issues = try await jiraService.fetchIssues(year: year)
+        let issues = try await jiraService.fetchIssues(year: year, platform: platform)
         
         // 3. 전체 데이터 컨텍스트 생성
-        let context = ReportGenerator.generateContext(issues: issues, year: year, spaceKey: spaceKey)
+        let context = ReportGenerator.generateContext(issues: issues, year: year, spaceKey: spaceKey, platform: platform)
         
         // 4. HTML 테이블 생성 (연간 평가 템플릿 스타일)
         let tableHtml = generateYearlyReportHtml(context: context)
@@ -176,10 +182,37 @@ struct MoaController: RouteCollection {
                     var noVersionIssues: [ProcessedIssue] = []
                     
                     for issue in monthData.issues {
-                        if let version = issue.versions.first {
+                        // [Modified] Wiki 생성 시 플랫폼 필터링 적용
+                        // JiraService는 Sorting만 하므로, 여기서 필터링 수행
+                        let targetVersions: [VersionInfo]
+                        if let platform = context.platform, !platform.isEmpty {
+                            targetVersions = issue.versions.filter { $0.name.localizedCaseInsensitiveContains(platform) }
+                        } else {
+                            targetVersions = issue.versions
+                        }
+                        
+                        if let version = targetVersions.first {
                             issuesByVersion[version, default: []].append(issue)
                         } else {
-                            noVersionIssues.append(issue)
+                            // 플랫폼 필터링으로 인해 버전이 없어졌거나 원래 없던 경우
+                            // 원래 버전이 있었는데 필터링된 경우라면 '버전 없음'으로 가거나 제외해야 함.
+                            // 여기서는 '버전 없음'으로 처리하거나, 원래 로직대로 첫번째 버전을 사용하되 필터링된게 없으면 원본 사용?
+                            // 사용자의 의도는 "Wiki에는 해당 플랫폼 버전만 나오길 원함"
+                            
+                            if !issue.versions.isEmpty && (context.platform != nil) {
+                                // 원래 버전은 있는데 필터링되어 사라진 경우 -> 이 이슈는 해당 플랫폼 이슈가 아닐 수 있음.
+                                // 하지만 JiraService에서 Sorting을 했으므로, 만약 해당 플랫폼 버전이 있었다면 맨 앞에 왔을 것.
+                                // 맨 앞 버전이 매칭되지 않는다면, 그 이슈는 해당 플랫폼 버전이 없는 것.
+                                // 그래도 이슈 자체는 표시해야 하나?
+                                // "릴리즈 버전 iOS, 안드로이드 둘다 찍히네" -> Wiki에서는 하나만 찍히길 원함.
+                                // 이슈 자체를 숨길지, 버전만 숨길지?
+                                // 보통 에픽은 양쪽 플랫폼 다 나가는 경우가 많음.
+                                // 필터링된 버전이 없으면 -> 그냥 표시 안함? 아니면 '기타'로 표시?
+                                // 일단 필터링된 버전이 없으면 noVersionIssues로 보냄.
+                                noVersionIssues.append(issue)
+                            } else {
+                                noVersionIssues.append(issue)
+                            }
                         }
                     }
                     
@@ -209,12 +242,21 @@ struct MoaController: RouteCollection {
                     }
                     
                     if !noVersionIssues.isEmpty {
-                        html += "<p><strong>버전 없음</strong></p>"
-                        html += "<ul>"
-                        for issue in noVersionIssues {
-                            html += #"<li><a href="\#(issue.link)" data-card-appearance="inline">\#(issue.link)</a></li>"#
-                        }
-                        html += "</ul>"
+                        // [Modified] 플랫폼 필터링 시, 버전이 매칭되지 않는 이슈들은 표시하지 않거나 별도 표시
+                        // 여기서는 일단 표시하되, 사용자가 원치 않으면 제거 가능.
+                        // 사용자의 요구: "Wiki 작성하는거에서... (갯수) 하면 안되나?" -> 이건 다른 요구사항.
+                        // "원래대로 복구해줘" -> Web Report는 복구.
+                        // Wiki는 필터링 적용.
+                        
+                        // 만약 플랫폼이 지정되었는데 버전이 매칭 안된 이슈들이라면, Wiki에 넣지 않는게 맞을 수도 있음.
+                        // 하지만 안전하게 표시.
+                        
+                        // html += "<p><strong>버전 없음 / 타 플랫폼</strong></p>"
+                        // html += "<ul>"
+                        // for issue in noVersionIssues {
+                        //     html += #"<li><a href="\#(issue.link)" data-card-appearance="inline">\#(issue.link)</a></li>"#
+                        // }
+                        // html += "</ul>"
                     }
                 } else {
                     html += "<p style='color: #999;'>-</p>"

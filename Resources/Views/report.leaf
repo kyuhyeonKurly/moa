@@ -221,8 +221,7 @@
             #for(month in monthlyGrid):
             <div class="month-card" style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f5f5f7; padding-bottom: 10px;">
-                    <h3 style="margin: 0; color: #1d1d1f; font-size: 1.2rem;">#(month.monthName)</h3>
-                    <span style="background: #f5f5f7; color: #86868b; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">#(count(month.issues))</span>
+                    <h3 style="margin: 0; color: #1d1d1f; font-size: 1.2rem;">#(month.monthName) (#(count(month.issues)))</h3>
                 </div>
                 
                 <div style="flex: 1;">
@@ -236,7 +235,7 @@
                             <div class="issue-meta">
                                 <span class="type-badge">#(issue.issueType)</span>
                                 #for(v in issue.versions):
-                                <span style="font-size: 0.6rem; color: #666; background-color: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">#(v.name)</span>
+                                    <span style="font-size: 0.6rem; color: #666; background-color: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">#(v.name)</span>
                                 #endfor
                             </div>
                         </li>
