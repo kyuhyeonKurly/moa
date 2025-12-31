@@ -14,3 +14,8 @@ playground.xcworkspace
 .DS_Store
 .vscode/
 *.xcodeproj
+
+# Exports & Generated Files
+exports/
+tickets_*.md
+domain-guideline*.md
