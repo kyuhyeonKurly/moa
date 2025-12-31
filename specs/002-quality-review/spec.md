@@ -1,4 +1,4 @@
-# Spec 001: Quality Review (품질 회고)
+# Spec 002: Quality Review (품질 회고)
 
 ## 1. Intent (의도)
 단순히 "얼마나 많이 일했는가(Output)"를 보여주는 것을 넘어, **"얼마나 완성도 있게 일했는가(Outcome)"**를 회고할 수 있는 도구로 진화시킨다.
