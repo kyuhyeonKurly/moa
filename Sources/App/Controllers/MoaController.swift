@@ -48,16 +48,9 @@ struct MoaController: RouteCollection {
 
     func generateReport(req: Request) async throws -> Response {
         // API 요청은 JSON Body로 받는다고 가정
-        struct ReportRequest: Content {
-            let year: Int
-            let assignee: String?
-            let email: String
-            let token: String
-            let spaceKey: String?
-            let platform: String? // "iOS" or "Android"
-        }
-        
+        // try req.content.validate(ReportRequest.self) // FIXME: Compilation error
         let params = try req.content.decode(ReportRequest.self)
+        try params.validate()
         req.logger.info("[Debug] ReportRequest received. Platform: \(params.platform ?? "nil")")
         
         // 공백 제거 (복사/붙여넣기 실수 방지)
@@ -65,7 +58,7 @@ struct MoaController: RouteCollection {
         let cleanToken = params.token.trimmingCharacters(in: .whitespacesAndNewlines)
         
         let jiraClient = JiraAPIClient(client: req.client, email: cleanEmail, token: cleanToken)
-        let jiraService = JiraService(apiClient: jiraClient)
+        let jiraService = JiraService(apiClient: jiraClient, logger: req.logger)
         
         // 1. 이슈 모으기
         // assignee가 빈 문자열이면 nil로 처리
@@ -76,9 +69,12 @@ struct MoaController: RouteCollection {
         let context = ReportGenerator.generateContext(issues: issues, year: params.year, spaceKey: params.spaceKey, platform: params.platform)
         
         // 3. Leaf 템플릿 렌더링
+        // Vapor 4의 ViewRenderer.render는 EventLoopFuture<View>를 반환합니다.
+        // Swift Concurrency 환경에서는 .get()을 사용하여 비동기 결과를 기다립니다.
         let view = try await req.view.render("report", context).get()
         
         // 4. Response 생성 및 쿠키 설정
+        // View.encodeResponse(for:)는 EventLoopFuture<Response>를 반환합니다.
         let response = try await view.encodeResponse(for: req).get()
         
         // 로그인 성공 시 쿠키에 저장 (30일 유지)
@@ -111,7 +107,7 @@ struct MoaController: RouteCollection {
         // 사용자 정보 조회 (이름 포함)
         let user = try await jiraClient.getMyself()
         
-        let jiraService = JiraService(apiClient: jiraClient)
+        let jiraService = JiraService(apiClient: jiraClient, logger: req.logger)
         let issues = try await jiraService.fetchIssues(year: year, platform: platform)
         
         // 3. 전체 데이터 컨텍스트 생성

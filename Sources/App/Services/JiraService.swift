@@ -2,9 +2,15 @@ import Vapor
 
 struct JiraService {
     let apiClient: JiraAPIClient
+    let logger: Logger
+    
+    init(apiClient: JiraAPIClient, logger: Logger) {
+        self.apiClient = apiClient
+        self.logger = logger
+    }
     
     func fetchIssues(year: Int, assignee: String? = nil, platform: String? = nil) async throws -> [ProcessedIssue] {
-        print("[Debug] fetchIssues started. Year: \(year), Assignee: \(assignee ?? "nil")")
+        logger.info("[Debug] fetchIssues started. Year: \(year), Assignee: \(assignee ?? "nil")")
 
         // 0. 내 정보 가져오기 (AccountId 식별용 & 토큰 검증)
         var myAccountId: String?
@@ -14,23 +20,27 @@ struct JiraService {
             if myselfResponse.status == .ok {
                 let myself = try myselfResponse.content.decode(Myself.self)
                 myAccountId = myself.accountId
-                print("[Debug] ✅ Auth Success! Logged in as: \(myself.displayName)")
+                logger.info("[Debug] ✅ Auth Success! Logged in as: \(myself.displayName)")
             } else {
-                print("[Debug] ❌ Auth Failed! Status: \(myselfResponse.status)")
+                logger.error("[Debug] ❌ Auth Failed! Status: \(myselfResponse.status)")
                 throw Abort(.unauthorized, reason: "Jira 인증 실패: 이메일과 토큰을 확인해주세요. (Status: \(myselfResponse.status))")
             }
         } catch {
-            print("[Debug] ❌ Auth Request Error: \(error)")
+            logger.error("[Debug] ❌ Auth Request Error: \(error)")
             throw Abort(.unauthorized, reason: "Jira 인증 요청 중 오류 발생: \(error)")
         }
+        
+        // myAccountId 사용 (경고 제거용)
+        _ = myAccountId
         
         // 1. 먼저 사용자가 활동한 프로젝트를 찾기 위해 광범위한 검색 수행
         // [Modified] 모든 내 이슈를 먼저 수집 (Sub-task 포함)
         let assigneeClause = assignee != nil ? "assignee = \"\(assignee!)\"" : "assignee = currentUser()"
+        let nextYear = year + 1
         let jql = """
         \(assigneeClause) 
         AND project not in (KQA) 
-        AND (created >= \(year)-01-01 OR resolutiondate >= \(year)-01-01)
+        AND ((created >= \(year)-01-01 AND created < \(nextYear)-01-01) OR (resolutiondate >= \(year)-01-01 AND resolutiondate < \(nextYear)-01-01))
         """
         
         // 2. 이슈 수집 실행
@@ -53,8 +63,8 @@ struct JiraService {
     }
     
     private func executeJqlSearch(jql: String, platform: String? = nil) async throws -> [ProcessedIssue] {
-        print("[Debug] executeJqlSearch called. Platform: \(platform ?? "nil")")
-        print("[Debug] JQL: \(jql)")
+        logger.debug("[Debug] executeJqlSearch called. Platform: \(platform ?? "nil")")
+        logger.debug("[Debug] JQL: \(jql)")
         
         var issues: [ProcessedIssue] = []
         var nextPageToken: String? = nil
@@ -69,7 +79,7 @@ struct JiraService {
                 nextPageToken: nextPageToken
             )
             
-            print("[Debug] Search returned \(searchResult.issues.count) issues.")
+            logger.debug("[Debug] Search returned \(searchResult.issues.count) issues.")
             
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -93,8 +103,8 @@ struct JiraService {
                 
                 let sortedVersions: [VersionInfo]
                 if let platform = platform, !platform.isEmpty {
-                    print("[Debug] Filtering Issue \(issue.key) for platform: '\(platform)'")
-                    print("[Debug] Raw Versions: \(rawVersions.map { $0.name })")
+                    logger.debug("[Debug] Filtering Issue \(issue.key) for platform: '\(platform)'")
+                    logger.debug("[Debug] Raw Versions: \(rawVersions.map { $0.name })")
                     
                     sortedVersions = rawVersions.filter { version in
                         version.name.localizedCaseInsensitiveContains(platform)

@@ -65,4 +65,21 @@ final class JiraAPIClient {
         
         return try response.content.decode(JiraSearchResponse.self)
     }
+    
+    // MARK: - Issue Detail (상세 조회)
+    
+    /// 단일 이슈 상세 조회 (description, attachment, comment 포함)
+    func fetchIssueDetail(issueKey: String) async throws -> JiraIssueDetail {
+        let fields = ["summary", "description", "status", "issuetype", "assignee", "created", "updated", "attachment", "comment"]
+        let uri = URI(string: "\(apiBaseURL)/rest/api/3/issue/\(issueKey)?fields=\(fields.joined(separator: ","))")
+        
+        let response = try await client.get(uri, headers: headers)
+        
+        guard response.status == .ok else {
+            let body = response.body.map { String(buffer: $0) } ?? "No body"
+            throw Abort(.notFound, reason: "Issue not found: \(issueKey). \(body)")
+        }
+        
+        return try response.content.decode(JiraIssueDetail.self)
+    }
 }

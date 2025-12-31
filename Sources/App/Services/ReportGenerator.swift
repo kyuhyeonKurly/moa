@@ -1,59 +1,5 @@
 import Vapor
 
-struct ReportContext: Encodable {
-    let year: Int
-    let totalCount: Int
-    let typeCounts: [TypeCountItem]
-    let monthlyGrid: [MonthlyGridItem]
-    let spaceKey: String? // Added spaceKey
-    let platform: String? // Added platform
-    
-    // 기존 필드 (하위 호환성 유지)
-    let monthlyStats: [MonthlyStat]
-    let topLabels: [LabelCountItem] // Added topLabels
-    let projects: [ProjectGroup]
-    let versionProjects: [ProjectGroup]
-}
-
-struct TypeCountItem: Encodable {
-    let type: String
-    let count: Int
-}
-
-struct LabelCountItem: Encodable {
-    let label: String
-    let count: Int
-}
-
-struct MonthlyGridItem: Encodable {
-    let monthName: String
-    let monthIndex: Int
-    let issues: [ProcessedIssue]
-}
-
-struct MonthlyStat: Encodable {
-    let month: Int
-    let count: Int
-}
-
-struct ProjectGroup: Encodable {
-    let name: String
-    let groups: [SubGroup] // 에픽 또는 버전 그룹
-}
-
-struct SubGroup: Encodable {
-    let title: String
-    let key: String?
-    let link: String?
-    let roots: [IssueNode] // 트리 구조 지원
-    let isVersion: Bool
-    let count: Int
-}
-
-struct IssueNode: Encodable {
-    let issue: ProcessedIssue
-    let children: [IssueNode]
-}
 
 struct ReportGenerator {
     static func generateContext(issues: [ProcessedIssue], year: Int, spaceKey: String? = nil, platform: String? = nil) -> ReportContext {
@@ -101,7 +47,7 @@ struct ReportGenerator {
         }
         
         let typeCounts = typeCountsDict.map { key, value in
-            TypeCountItem(type: key, count: value)
+            ReportContext.TypeCountItem(type: key, count: value)
         }.sorted { item1, item2 in
             let p1 = getTypePriority(item1.type)
             let p2 = getTypePriority(item2.type)
@@ -121,7 +67,7 @@ struct ReportGenerator {
             }
         }
         let topLabels = labelCountsDict.map { key, value in
-            LabelCountItem(label: key, count: value)
+            ReportContext.LabelCountItem(label: key, count: value)
         }.sorted { $0.count > $1.count }.prefix(5).map { $0 }
 
         // 4. 월별 통계 (Release Date 기준)
@@ -134,12 +80,12 @@ struct ReportGenerator {
         }
         
         let monthlyStats = issuesByMonth.keys.sorted().map { month in
-            MonthlyStat(month: month, count: issuesByMonth[month]?.count ?? 0)
+            ReportContext.MonthlyStat(month: month, count: issuesByMonth[month]?.count ?? 0)
         }
         
         // 3. 월별 그리드 (1월 ~ 12월)
         // 조건: 버전이 있고, 서브태스크가 아닌 최상위 티켓만 표시
-        var monthlyGrid: [MonthlyGridItem] = []
+        var monthlyGrid: [ReportContext.MonthlyGridItem] = []
         let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         
         for i in 1...12 {
@@ -214,7 +160,7 @@ struct ReportGenerator {
                 return issue1.createdDate < issue2.createdDate
             }
             
-            monthlyGrid.append(MonthlyGridItem(
+            monthlyGrid.append(ReportContext.MonthlyGridItem(
                 monthName: monthNames[i-1],
                 monthIndex: i,
                 issues: filteredIssues
@@ -225,7 +171,7 @@ struct ReportGenerator {
         let issuesByProject = Dictionary(grouping: displayIssues) { $0.projectKey }
         let sortedProjectKeys = issuesByProject.keys.sorted()
         
-        let projects = sortedProjectKeys.map { pKey -> ProjectGroup in
+        let projects = sortedProjectKeys.map { pKey -> ReportContext.ProjectGroup in
             let projectIssues = issuesByProject[pKey] ?? []
             
             // Group by Parent (Epic or Story)
@@ -249,14 +195,14 @@ struct ReportGenerator {
                 return k1 < k2
             }
             
-            let subGroups = sortedEpicKeys.map { eKey -> SubGroup in
+            let subGroups = sortedEpicKeys.map { eKey -> ReportContext.SubGroup in
                 let issuesInEpic = epicGroups[eKey] ?? []
                 let title = eKey == "No Epic" ? "에픽 없음" : (epicSummaries[eKey] ?? eKey)
                 let link = eKey == "No Epic" ? nil : "\(issuesInEpic.first?.link.components(separatedBy: "/browse/").first ?? "")/browse/\(eKey)"
                 
                 let roots = buildIssueTree(issues: issuesInEpic)
                 
-                return SubGroup(
+                return ReportContext.SubGroup(
                     title: title,
                     key: eKey == "No Epic" ? nil : eKey,
                     link: link,
@@ -266,11 +212,11 @@ struct ReportGenerator {
                 )
             }
             
-            return ProjectGroup(name: pKey, groups: subGroups)
+            return ReportContext.ProjectGroup(name: pKey, groups: subGroups)
         }
         
         // 6. 버전별 보기 데이터 생성 (VersionProjects)
-        let versionProjects = sortedProjectKeys.map { pKey -> ProjectGroup in
+        let versionProjects = sortedProjectKeys.map { pKey -> ReportContext.ProjectGroup in
             let projectIssues = issuesByProject[pKey] ?? []
             
             var versionGroups: [String: [ProcessedIssue]] = [:]
@@ -289,11 +235,11 @@ struct ReportGenerator {
                 return v1 > v2
             }
             
-            let subGroups = sortedVersionNames.map { vName -> SubGroup in
+            let subGroups = sortedVersionNames.map { vName -> ReportContext.SubGroup in
                 let issuesInVersion = versionGroups[vName] ?? []
                 let roots = buildIssueTree(issues: issuesInVersion)
                 
-                return SubGroup(
+                return ReportContext.SubGroup(
                     title: vName,
                     key: nil,
                     link: nil,
@@ -303,7 +249,7 @@ struct ReportGenerator {
                 )
             }
             
-            return ProjectGroup(name: pKey, groups: subGroups)
+            return ReportContext.ProjectGroup(name: pKey, groups: subGroups)
         }
         
         return ReportContext(
@@ -321,7 +267,7 @@ struct ReportGenerator {
     }
     
     // 트리 빌더
-    private static func buildIssueTree(issues: [ProcessedIssue]) -> [IssueNode] {
+    private static func buildIssueTree(issues: [ProcessedIssue]) -> [ReportContext.IssueNode] {
         // 1. 모든 이슈를 Node로 변환 (참조를 위해 클래스 사용하거나 딕셔너리 사용)
         // 여기서는 간단히 딕셔너리 사용.
         // 부모-자식 관계를 맺으려면 부모가 '이 리스트 안에' 있어야 함.
@@ -341,9 +287,9 @@ struct ReportGenerator {
         }
         
         // 재귀적으로 Node 생성
-        func createNode(issue: ProcessedIssue) -> IssueNode {
+        func createNode(issue: ProcessedIssue) -> ReportContext.IssueNode {
             let children = childrenMap[issue.key]?.map { createNode(issue: $0) } ?? []
-            return IssueNode(issue: issue, children: children)
+            return ReportContext.IssueNode(issue: issue, children: children)
         }
         
         return roots.map { createNode(issue: $0) }
