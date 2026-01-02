@@ -175,6 +175,7 @@ struct JiraService {
         var releaseDateMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0.releaseDate) })
         var parentMap = Dictionary(uniqueKeysWithValues: issues.map { ($0.key, $0.parentKey) })
         
+        // 버전이 없는 이슈의 버전 상속 처리
         for _ in 0..<3 {
             let unresolvedKeys = issueMap.keys.filter { (versionMap[$0]?.isEmpty ?? true) && parentMap[$0] != nil }
             if unresolvedKeys.isEmpty { break }
@@ -205,8 +206,20 @@ struct JiraService {
             if !changed && missingParentKeys.isEmpty { break }
         }
         
+        // 모든 이슈에 대해 Root Parent 찾기 (버전 유무와 관계없이)
+        // 부모가 있는데 아직 issueMap에 없는 경우 추가로 fetch
+        let allParentKeys = Set(issues.compactMap { $0.parentKey })
+        let missingParentKeys = allParentKeys.subtracting(Set(issueMap.keys))
+        if !missingParentKeys.isEmpty {
+            let fetchedParents = try await fetchIssuesByKeys(keys: Array(missingParentKeys), platform: platform)
+            for p in fetchedParents {
+                issueMap[p.key] = p
+                parentMap[p.key] = p.parentKey
+            }
+        }
+        
         return issues.map { issue in
-            // Find Root Parent (Display Parent)
+            // Find Root Parent (Display Parent) - 버전 유무와 관계없이 항상 계산
             var currentKey = issue.key
             var visited = Set<String>()
             while let pKey = parentMap[currentKey] ?? nil, !visited.contains(pKey) {
