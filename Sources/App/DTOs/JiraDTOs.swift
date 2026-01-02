@@ -114,8 +114,12 @@ struct JiraDetailFields: Content {
     let assignee: JiraFields.JiraAssignee?
     let created: String
     let updated: String?
+    let resolutiondate: String?
+    let labels: [String]?
     let attachment: [JiraAttachment]?
     let comment: JiraCommentWrapper?
+    let subtasks: [JiraSubtask]?
+    let issuelinks: [JiraIssueLink]?
 }
 
 // MARK: - ADF (Atlassian Document Format)
@@ -206,4 +210,36 @@ struct JiraComment: Content {
 struct JiraCommentAuthor: Content {
     let accountId: String
     let displayName: String
+}
+
+// MARK: - Subtask & Links
+
+struct JiraSubtask: Content {
+    let key: String
+    let fields: JiraSubtaskFields
+}
+
+struct JiraSubtaskFields: Content {
+    let summary: String
+    let status: JiraFields.JiraStatus
+}
+
+struct JiraIssueLink: Content {
+    let type: JiraLinkType
+    let inwardIssue: JiraLinkedIssue?
+    let outwardIssue: JiraLinkedIssue?
+}
+
+struct JiraLinkType: Content {
+    let name: String
+}
+
+struct JiraLinkedIssue: Content {
+    let key: String
+    let fields: JiraLinkedIssueFields
+}
+
+struct JiraLinkedIssueFields: Content {
+    let summary: String
+    let status: JiraFields.JiraStatus
 }

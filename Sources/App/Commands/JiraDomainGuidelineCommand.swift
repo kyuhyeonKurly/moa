@@ -121,11 +121,12 @@ struct JiraDomainGuidelineCommand: Command {
         ),
         "mmp": DomainConfig(
             displayName: "📊 MMP/마케팅 (Marketing & Attribution)",
-            keywords: ["appsflyer", "mmp", "어트리뷰션", "attribution", "마케팅", "branch", "링크"],
+            keywords: ["appsflyer", "앱스플라이어", "mmp", "어트리뷰션", "attribution", "마케팅", "branch", "링크", "sdk 설치", "이벤트 트래커"],
             subTopics: [
-                "Appsflyer": ["appsflyer", "apps flyer"],
+                "Appsflyer": ["appsflyer", "앱스플라이어", "apps flyer"],
                 "Branch": ["branch", "브랜치"],
-                "어트리뷰션": ["어트리뷰션", "attribution", "mmp"]
+                "어트리뷰션": ["어트리뷰션", "attribution", "mmp"],
+                "이벤트트래킹": ["이벤트 트래커", "amplitude", "uninstall"]
             ]
         ),
         "ai": DomainConfig(
@@ -203,12 +204,22 @@ struct JiraDomainGuidelineCommand: Command {
                     box.yearlyData[year] = issues
                 }
                 
-                // 상위 티켓(parent) 정보 별도 조회 - 담당자 무관하게 조회
+                // 1차: 상위 티켓(parent) 정보 조회
                 context.console.print("🔗 Fetching parent issue details...")
                 let allParentKeys = Set(box.yearlyData.values.flatMap { $0 }.compactMap { $0.parentKey })
                 for parentKey in allParentKeys {
                     if let parentInfo = try? await self.fetchParentInfo(client: client, issueKey: parentKey) {
                         box.parentInfo[parentKey] = parentInfo
+                    }
+                }
+                
+                // 2차: grandParent(에픽) 정보 조회 - parent의 parent까지 수집
+                context.console.print("🔗 Fetching grandparent (epic) details...")
+                let grandParentKeys = Set(box.parentInfo.values.compactMap { $0.grandParentKey })
+                    .subtracting(box.parentInfo.keys) // 아직 조회 안 한 것만
+                for grandParentKey in grandParentKeys {
+                    if let grandParentInfo = try? await self.fetchParentInfo(client: client, issueKey: grandParentKey) {
+                        box.parentInfo[grandParentKey] = grandParentInfo
                     }
                 }
                 
@@ -408,7 +419,15 @@ struct JiraDomainGuidelineCommand: Command {
         // 1단계: 상위 티켓 도메인 캐시 구축 (API로 조회한 parentInfo 활용)
         var parentDomainCache: [String: String] = [:] // parentKey -> domain
         
+        // 1-0) 강제 매핑된 parent 키 먼저 캐시에 추가
+        for (issueKey, domain) in forcedDomainMapping {
+            parentDomainCache[issueKey] = domain
+        }
+        
         for (parentKey, info) in parentInfo {
+            // 이미 강제 매핑된 경우 스킵
+            if parentDomainCache[parentKey] != nil { continue }
+            
             // 상위 티켓 summary + labels로 도메인 분류
             let parentText = "\(info.summary) \(info.labels.joined(separator: " "))".lowercased()
             var parentDomain = classifyTextToDomain(parentText)
@@ -418,6 +437,11 @@ struct JiraDomainGuidelineCommand: Command {
                let grandParentInfo = parentInfo[grandParentKey] {
                 let grandParentText = "\(grandParentInfo.summary) \(grandParentInfo.labels.joined(separator: " "))".lowercased()
                 parentDomain = classifyTextToDomain(grandParentText)
+            }
+            
+            // 상위 티켓도 강제 매핑 확인
+            if parentDomain == "etc", let forcedDomain = forcedDomainMapping[parentKey] {
+                parentDomain = forcedDomain
             }
             
             parentDomainCache[parentKey] = parentDomain
@@ -451,10 +475,19 @@ struct JiraDomainGuidelineCommand: Command {
         // 2단계: 이슈 분류 (버그/백로그 우선, 그 다음 상위 티켓 도메인 상속)
         for (year, issues) in yearlyData {
             for issue in issues {
+                // 0) 제외 이슈 스킵 (close된 티켓 등)
+                if excludedIssues.contains(issue.key) {
+                    continue
+                }
+                
                 var domainKey: String
                 
+                // 0-1) 강제 매핑 우선 체크 (버그/백로그보다 우선)
+                if let forcedDomain = forcedDomainMapping[issue.key] {
+                    domainKey = forcedDomain
+                }
                 // 1) 버그 타입 → 버그수정 카테고리
-                if isBugType(issue.issueType) {
+                else if isBugType(issue.issueType) {
                     domainKey = "bugfix"
                 }
                 // 2) 미완료 티켓 → 백로그 카테고리
@@ -468,6 +501,18 @@ struct JiraDomainGuidelineCommand: Command {
                     domainKey = parentDomain
                 } else {
                     domainKey = classifyIssueToDomain(issue)
+                }
+                
+                // 연결된 이슈인 경우 상위 티켓의 도메인 상속
+                for (linkedParent, linkedChildren) in linkedIssues {
+                    if linkedChildren.contains(issue.key),
+                       let linkedParentInfo = parentInfo[linkedParent] {
+                        let linkedParentText = "\(linkedParentInfo.summary) \(linkedParentInfo.labels.joined(separator: " "))".lowercased()
+                        let linkedDomain = classifyTextToDomain(linkedParentText)
+                        if linkedDomain != "etc" {
+                            domainKey = linkedDomain
+                        }
+                    }
                 }
                 
                 if let filter = filterDomain, domainKey != filter { continue }
@@ -559,13 +604,93 @@ struct JiraDomainGuidelineCommand: Command {
     }
     
     /// 특정 티켓 키에 대한 강제 도메인 매핑
-    /// - KMA-4732: 개발자 모드 관련 딥링크 → 플랫폼/인프라
-    /// - KMA-1922: 리모트 컨피그 딥링크 처리 → 실험
-    /// - KMA-4540: 검색 > 딥링크 버그 → 검색
+    /// 사용자 피드백 기반 수동 분류
     private let forcedDomainMapping: [String: String] = [
-        "KMA-4732": "platform",
-        "KMA-1922": "experiment",
-        "KMA-4540": "search"
+        // 기존 매핑
+        "KMA-4732": "platform",   // 개발자 모드 관련 딥링크 → 플랫폼/인프라
+        "KMA-1922": "experiment", // 리모트 컨피그 딥링크 처리 → 실험
+        "KMA-4540": "search",     // 검색 > 딥링크 버그 → 검색
+        
+        // 2025년 - 검색 도메인 (SwiftUI 전환 작업 - 검색화면)
+        "KMA-5541": "search",     // SwiftUI으로 구조 개선 → 검색
+        "KMA-5530": "search",     // SwiftUI 전환 OS별 안정성 → 검색
+        "KMA-5536": "search",     // SwiftUI 전환 컨벤션/코드리뷰 → 검색
+        "KMA-5096": "search",     // URL Encode 로직 분리 → 검색
+        "KMA-5121": "search",     // 브랜드관 로고 노출 개선 → 검색
+        "KMA-4926": "search",     // 뷰티마켓결과 하단 마진 추가 → 검색
+        
+        // 2025년 - MMP (AppsFlyer 도입)
+        "KMA-5302": "mmp",        // SDK 설치하고 기존 이벤트 대체 → MMP
+        "KMA-5426": "mmp",        // Amplitude 통합 → MMP
+        "KMA-5435": "mmp",        // Uninstall Measurement → MMP
+        "KMA-5440": "mmp",        // 이벤트 트래커 구조 변경 → MMP
+        "KMA-5452": "mmp",        // SKAN 포스트백 적용 → MMP
+        
+        // 2024년 - 홈전시
+        "KMA-4718": "home",       // horizontal scroll 백스와이프 → 홈전시
+        "KMA-4182": "home",       // 전광판 UX/UI 개선 → 홈전시
+        "KMA-4184": "home",       // 전광판 UX/UI 개선 iOS → 홈전시
+        "KMA-4361": "home",       // 전광판이 최하단 콘텐츠 가리는 이슈 → 홈전시
+        
+        // 2024년 - 플랫폼/인프라
+        "KMA-4614": "platform",   // 웹뷰 화면 전환 로직 → 플랫폼/인프라
+        "KMA-4659": "platform",   // 페이스북 공유하기 불필요 로직 제거 → 플랫폼/인프라
+        "KMA-4648": "platform",   // 백스와이프 취소 후 백버튼 사라짐 → 플랫폼/인프라
+        "KMA-4675": "platform",   // 기타 누락된 작업 검토 및 수정 → 플랫폼/인프라
+        "KMA-4548": "platform",   // 프로젝트에서 사용되지 않는 레거시들 → 플랫폼/인프라
+        "KMA-4556": "platform",   // Sendable 관련 워닝 → 플랫폼/인프라
+        "KMA-4460": "platform",   // RequestManager 사용성 점검 → 플랫폼/인프라
+        "KMA-4502": "platform",   // RequestManager device 관련 로직 → 플랫폼/인프라
+        "KMA-4503": "platform",   // RequestManager 노티 관련 로직 → 플랫폼/인프라
+        "KMA-4543": "platform",   // 텍스트필드 navigationItem 이슈 → 플랫폼/인프라
+        "KMA-4297": "platform",   // 네트워크 환경 세팅 속도 → 플랫폼/인프라
+        
+        // 2024년 - MMP (Amplitude)
+        "KMA-4377": "mmp",        // AmplitudeManager 크래시 → MMP
+        "KMA-4437": "mmp",        // 디바이스 너비에 따른 위치 변경 → MMP (Amplitude 관련)
+        "KMA-4448": "mmp",        // 앰플리튜드 프로퍼티 싱크 → MMP
+        
+        // 2024년 - 카테고리
+        "KMA-4187": "category",   // 콜렉션타입 리스트 배너 스킵 → 카테고리
+        
+        // 2024년 - MMP (Amplitude 관련)
+        "KMA-4108": "mmp",        // 앰플리튜드 DeviceID regenerate 제거 → MMP
+        "KMA-4114": "mmp",        // 앰플리튜드 디바이스 ID 재생성 로직 제거 → MMP
+        "KMA-3851": "mmp",        // 앰플리튜드 IP 추적 옵션 비활성화 해제 → MMP
+        "KMA-3852": "mmp",        // 앰플리튜드 IP 추적 옵션 비활성화 해제 iOS → MMP
+        "KMA-2253": "mmp",        // view_subtab Amplitude 이벤트 삭제 → MMP
+        
+        // 2023년 - 장바구니/결제
+        "KMA-3552": "cart",       // 휴대폰 PG사 전환 → 장바구니/결제
+        "KMA-3553": "cart",       // 휴대폰 PG사 전환 iOS → 장바구니/결제
+        
+        // 2023년 - 플랫폼/인프라
+        "KMA-3318": "platform",   // Console Log 정리 → 플랫폼/인프라
+        "KMA-3600": "platform",   // 베타앱 켈로그 서버 URL 변경 → 플랫폼/인프라
+        "KMA-3202": "platform",   // IndexPath 초기화 → 플랫폼/인프라
+        "KMA-3258": "platform",   // 템플릿 디코더 방어코드 → 플랫폼/인프라
+        "KMA-2294": "platform",   // 로그시스템 리모트컨피그 ON/OFF → 플랫폼/인프라
+        "KMA-2466": "platform",   // clipboard 복사 웹뷰 인터페이스 → 플랫폼/인프라
+        
+        // 2023년 - 홈전시
+        "KMA-3362": "home",       // 사이트 스위치 뷰티 N 뱃지 제거 → 홈전시
+        "KMA-2407": "home",       // Pull to refresh 로딩 아이콘 2개 → 홈전시
+        "KMA-2197": "home",       // 1콘텐츠 N딜 사이드이펙트 → 홈전시
+        
+        // 2023년 - 마이컬리
+        "KMA-2422": "mykurly",    // check-address api base_address_type 추가 → 마이컬리
+        "KMA-2336": "mykurly",    // 배송지 및 출입방법 노출 개선 → 마이컬리
+    ]
+    
+    /// 제외할 티켓 (close된 티켓 - 실제 작업 수행 안함)
+    private let excludedIssues: Set<String> = [
+        "KMA-4709",  // [iOS] 구조화된 로그 정보 → close로 변경됨 (작업 미수행)
+    ]
+    
+    /// 하위 이슈로 연결할 매핑 (parentKey -> [childKeys])
+    /// 실제로는 같은 작업인데 별도 티켓으로 생성된 경우
+    private let linkedIssues: [String: [String]] = [
+        "KMA-4638": ["KMA-4648", "KMA-4675"],  // 백스와이프 관련 작업들
     ]
     
     /// 도메인 우선순위 (특수 키워드 도메인이 일반 도메인보다 먼저 체크됨)

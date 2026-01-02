@@ -10,3 +10,11 @@ struct ConfluencePageResponse: Content {
         let webui: String
     }
 }
+
+// MARK: - Confluence Current User (for /rest/api/user/current)
+
+struct ConfluenceCurrentUser: Content {
+    let accountId: String
+    let displayName: String
+    let email: String?
+}
