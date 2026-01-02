@@ -40,8 +40,8 @@ struct JiraService {
         let nextYear = year + 1
         let jql = """
         \(assigneeClause) 
-        AND project not in (KQA) 
-        AND created >= \(year)-01-01 AND created < \(nextYear)-01-01
+        AND project NOT IN (KQA) 
+        AND created >= "\(year)-01-01" AND created < "\(nextYear)-01-01"
         """
         
         // 2. 이슈 수집 실행
