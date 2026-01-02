@@ -349,6 +349,30 @@ struct MoaController: RouteCollection {
             </tbody>
         </table>
         """
+        
+        // 월별 플랫 리스트 (인라인 티켓 확인용)
+        html += """
+        <br/>
+        <hr/>
+        <h3>📋 월별 티켓 목록 (검토용)</h3>
+        <p style="color: #6B778C; font-size: 0.9em;">
+            ※ 인라인으로 펼쳐지는 티켓 목록입니다. 불필요한 항목을 가지치기 하세요.
+        </p>
+        """
+        
+        let monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"]
+        
+        for monthIndex in 1...12 {
+            if let monthData = context.monthlyGrid.first(where: { $0.monthIndex == monthIndex }), !monthData.issues.isEmpty {
+                html += "<h4>\(monthNames[monthIndex - 1]) (\(monthData.issues.count)건)</h4>"
+                html += "<ul>"
+                for issue in monthData.issues {
+                    html += #"<li><a href="\#(issue.link)" data-card-appearance="inline">\#(issue.link)</a></li>"#
+                }
+                html += "</ul>"
+            }
+        }
+        
         return html
     }
 }
