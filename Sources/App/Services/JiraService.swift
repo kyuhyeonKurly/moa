@@ -35,12 +35,13 @@ struct JiraService {
         
         // 1. 먼저 사용자가 활동한 프로젝트를 찾기 위해 광범위한 검색 수행
         // [Modified] 모든 내 이슈를 먼저 수집 (Sub-task 포함)
+        // 해당 연도에 "생성된" 티켓만 조회 (resolutiondate 조건 제거 - 다른 연도 티켓 혼입 방지)
         let assigneeClause = assignee != nil ? "assignee = \"\(assignee!)\"" : "assignee = currentUser()"
         let nextYear = year + 1
         let jql = """
         \(assigneeClause) 
         AND project not in (KQA) 
-        AND ((created >= \(year)-01-01 AND created < \(nextYear)-01-01) OR (resolutiondate >= \(year)-01-01 AND resolutiondate < \(nextYear)-01-01))
+        AND created >= \(year)-01-01 AND created < \(nextYear)-01-01
         """
         
         // 2. 이슈 수집 실행
