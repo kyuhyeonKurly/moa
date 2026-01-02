@@ -35,17 +35,22 @@ struct JiraService {
         
         // 1. 먼저 사용자가 활동한 프로젝트를 찾기 위해 광범위한 검색 수행
         // [Modified] 모든 내 이슈를 먼저 수집 (Sub-task 포함)
-        // 해당 연도에 "생성된" 티켓만 조회 (resolutiondate 조건 제거 - 다른 연도 티켓 혼입 방지)
+        // 해당 연도에 "생성"되었거나 "완료"된 티켓 조회
+        // - 생성 기준: 해당 연도에 새로 만든 티켓
+        // - 완료 기준: 이전 연도에 만들었지만 해당 연도에 완료한 티켓 (백로그 처리 등)
         let assigneeClause = assignee != nil ? "assignee = \"\(assignee!)\"" : "assignee = currentUser()"
         let nextYear = year + 1
         let jql = """
         \(assigneeClause) 
         AND project NOT IN (KQA) 
-        AND created >= "\(year)-01-01" AND created < "\(nextYear)-01-01"
+        AND (
+            (created >= "\(year)-01-01" AND created < "\(nextYear)-01-01")
+            OR (resolutiondate >= "\(year)-01-01" AND resolutiondate < "\(nextYear)-01-01")
+        )
         """
         
         // 2. 이슈 수집 실행
-        var myIssues = try await executeJqlSearch(jql: jql, platform: platform)
+        var myIssues = try await executeJqlSearch(jql: jql, platform: platform, year: year)
         
         // 3. 내 이슈로 마킹
         for i in 0..<myIssues.count {
@@ -63,8 +68,8 @@ struct JiraService {
         let displayName: String
     }
     
-    private func executeJqlSearch(jql: String, platform: String? = nil) async throws -> [ProcessedIssue] {
-        logger.debug("[Debug] executeJqlSearch called. Platform: \(platform ?? "nil")")
+    private func executeJqlSearch(jql: String, platform: String? = nil, year: Int? = nil) async throws -> [ProcessedIssue] {
+        logger.debug("[Debug] executeJqlSearch called. Platform: \(platform ?? "nil"), Year: \(year ?? 0)")
         logger.debug("[Debug] JQL: \(jql)")
         
         var issues: [ProcessedIssue] = []
@@ -89,12 +94,39 @@ struct JiraService {
             let releaseDateFormatter = DateFormatter()
             releaseDateFormatter.dateFormat = "yyyy-MM-dd"
             
+            let calendar = Calendar.current
+            
             let pageIssues = searchResult.issues.map { issue -> ProcessedIssue in
-                let dateString = issue.fields.resolutiondate ?? issue.fields.created
-                let date = dateFormatter.date(from: dateString) 
-                    ?? backupDateFormatter.date(from: dateString) 
-                    ?? ISO8601DateFormatter().date(from: dateString)
+                // 생성일 파싱
+                let createdDateString = issue.fields.created
+                let createdDate = dateFormatter.date(from: createdDateString) 
+                    ?? backupDateFormatter.date(from: createdDateString) 
+                    ?? ISO8601DateFormatter().date(from: createdDateString)
                     ?? Date()
+                
+                // 완료일 파싱
+                var resolutionDate: Date? = nil
+                if let resDateString = issue.fields.resolutiondate {
+                    resolutionDate = dateFormatter.date(from: resDateString) 
+                        ?? backupDateFormatter.date(from: resDateString) 
+                        ?? ISO8601DateFormatter().date(from: resDateString)
+                }
+                
+                // 월별 배치 기준 날짜 결정
+                // - 이전 연도 생성 + 해당 연도 완료 → 완료일 기준
+                // - 해당 연도 생성 → 생성일 기준
+                let displayDate: Date
+                if let targetYear = year {
+                    let createdYear = calendar.component(.year, from: createdDate)
+                    if createdYear < targetYear, let resDate = resolutionDate {
+                        // 이전 연도 생성 + 올해 완료 → 완료일 기준으로 월 배치
+                        displayDate = resDate
+                    } else {
+                        displayDate = createdDate
+                    }
+                } else {
+                    displayDate = createdDate
+                }
                 
                 // Version Mapping & Sorting
                 let rawVersions: [VersionInfo] = issue.fields.fixVersions?.map { version in
@@ -104,8 +136,8 @@ struct JiraService {
                 
                 let sortedVersions: [VersionInfo]
                 if let platform = platform, !platform.isEmpty {
-                    logger.debug("[Debug] Filtering Issue \(issue.key) for platform: '\(platform)'")
-                    logger.debug("[Debug] Raw Versions: \(rawVersions.map { $0.name })")
+                    self.logger.debug("[Debug] Filtering Issue \(issue.key) for platform: '\(platform)'")
+                    self.logger.debug("[Debug] Raw Versions: \(rawVersions.map { $0.name })")
                     
                     sortedVersions = rawVersions.filter { version in
                         version.name.localizedCaseInsensitiveContains(platform)
@@ -139,10 +171,10 @@ struct JiraService {
                 return ProcessedIssue(
                     key: issue.key,
                     summary: issue.fields.summary,
-                    createdDate: date,
+                    createdDate: displayDate,
                     labels: issue.fields.labels,
                     versions: sortedVersions,
-                    link: "\(apiClient.apiBaseURL)/browse/\(issue.key)",
+                    link: "\(self.apiClient.apiBaseURL)/browse/\(issue.key)",
                     projectKey: projectKey,
                     parentKey: parentKey,
                     parentSummary: parentSummary,
