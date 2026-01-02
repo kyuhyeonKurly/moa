@@ -64,11 +64,14 @@ http://127.0.0.1:8080/moa/collect\?year\=2024
 Moa/
 ├── Sources/
 │   ├── App/
+│   │   ├── Commands/       # CLI 명령어 (jira-*, confluence-*)
 │   │   ├── Controllers/    # 요청 처리 (MoaController)
-│   │   ├── Models/         # 데이터 모델 (JiraIssue, ProcessedIssue 등)
+│   │   ├── DTOs/           # 데이터 전송 객체
 │   │   ├── Services/       # 비즈니스 로직
-│   │   │   ├── JiraService.swift       # Jira API 통신 및 데이터 가공
-│   │   │   └── ReportGenerator.swift   # 리포트 데이터 구조화 및 트리 빌딩
+│   │   │   ├── JiraAPIClient.swift     # Jira API 클라이언트
+│   │   │   ├── JiraService.swift       # Jira 데이터 가공
+│   │   │   ├── ConfluenceService.swift # Confluence API 클라이언트
+│   │   │   └── ReportGenerator.swift   # 리포트 데이터 구조화
 │   │   └── ...
 ├── Resources/
 │   └── Views/
@@ -76,5 +79,104 @@ Moa/
 └── ...
 ```
 
-## 📝 라이선스
-This project is for internal use.
+## 🖥️ CLI 명령어
+
+모든 명령어는 `swift run App <command>` 형식으로 실행합니다.
+
+### Jira 명령어
+
+#### 버전 관련
+
+| 명령어 | 설명 | 예시 |
+|--------|------|------|
+| `jira-versions` | 프로젝트 버전 목록 조회 | `swift run App jira-versions KMA -y 2024` |
+| `jira-version-detail` | 특정 버전의 이슈 조회 | `swift run App jira-version-detail KMA -v 10234 -m` |
+
+```bash
+# 2024년 릴리스 버전만 조회
+swift run App jira-versions KMA --year 2024
+
+# 특정 버전의 내 이슈만 조회
+swift run App jira-version-detail KMA --version 10234 --me
+```
+
+#### 티켓 조회
+
+| 명령어 | 설명 | 예시 |
+|--------|------|------|
+| `jira-tickets` | 연도별 티켓 목록 (웹과 동일) | `swift run App jira-tickets -y 2024 -g` |
+| `jira-detail` | 단일 이슈 상세 조회 | `swift run App jira-detail -i KMA-4564` |
+| `jira-issue-type` | 여러 이슈 타입 일괄 조회 | `swift run App jira-issue-type KMA-4771,KMA-4768` |
+| `jira-ticket-detail` | 여러 티켓 상세 조회 + 도메인 분류 | `swift run App jira-ticket-detail "KMA-4817,KMA-4764"` |
+
+```bash
+# 2024년 티켓을 버전별로 그룹화
+swift run App jira-tickets --year 2024 --group
+
+# 타입 태그와 함께 출력
+swift run App jira-tickets -y 2024 -t
+
+# 특정 이슈 상세 조회
+swift run App jira-detail --issue KMA-4564
+```
+
+#### 트리/계층 구조
+
+| 명령어 | 설명 | 예시 |
+|--------|------|------|
+| `jira-tree` | 이슈 하위 구조를 트리로 출력 | `swift run App jira-tree -i KMA-5788 -d 3` |
+
+```bash
+# Epic의 하위 구조를 3레벨까지 트리로 출력
+swift run App jira-tree --issue KMA-5788 --depth 3
+
+# 상세 정보 포함 + 마크다운 내보내기
+swift run App jira-tree -i KMA-5788 -v --export ./output.md
+```
+
+#### 연간 회고/분석
+
+| 명령어 | 설명 | 예시 |
+|--------|------|------|
+| `jira-export` | 연도별 티켓을 마크다운으로 내보내기 | `swift run App jira-export -y 2024` |
+| `jira-retrospective` | AI 에이전트용 회고 컨텍스트 생성 | `swift run App jira-retrospective -s 2021 -e 2025` |
+| `jira-domain-guideline` | 도메인별 세분화 가이드라인 | `swift run App jira-domain-guideline -s 2021 -e 2025` |
+| `jira-domain-detail` | 특정 도메인 상세 추출 | `swift run App jira-domain-detail -d search` |
+
+```bash
+# 2024년 티켓을 마크다운으로 내보내기
+swift run App jira-export --year 2024 --output ./exports/2024.md
+
+# 2021-2025 전체 회고 데이터 생성
+swift run App jira-retrospective --start 2021 --end 2025
+
+# 검색 도메인만 상세 추출
+swift run App jira-domain-detail --domain search --start 2021 --end 2025
+```
+
+### Confluence 명령어
+
+| 명령어 | 설명 | 예시 |
+|--------|------|------|
+| `confluence-wiki` | 스페이스별 연도별 위키 목록 | `swift run App confluence-wiki -s appr --start-year 2024` |
+| `confluence-children` | 페이지 하위 트리 조회 | `swift run App confluence-children 123456 -x` |
+
+```bash
+# 2024년 appr 스페이스 위키 페이지 조회
+swift run App confluence-wiki --space appr --start-year 2024 --end-year 2024 --export
+
+# 특정 페이지의 하위 구조 조회
+swift run App confluence-children 123456,789012 --export
+```
+
+### 공통 옵션
+
+| 옵션 | 설명 |
+|------|------|
+| `-y, --year` | 연도 필터 |
+| `-s, --start` | 시작 연도 |
+| `-e, --end` | 종료 연도 |
+| `-o, --output` | 출력 파일 경로 |
+| `-d, --domain` | 도메인 필터 (search, cart, home, category, mykurly, experiment, platform, design, product, filter, mmp, ai) |
+| `-x, --export` | 마크다운 파일로 내보내기 |
+
