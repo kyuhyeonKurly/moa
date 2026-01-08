@@ -21,6 +21,9 @@ public func configure(_ app: Application) async throws {
     // register commands - Confluence
     app.commands.use(ConfluenceWikiCommand(), as: "confluence-wiki")
     app.commands.use(ConfluenceChildrenCommand(), as: "confluence-children")
+    app.commands.use(ConfluenceOrganizeCommand(), as: "confluence-organize")
+    app.commands.use(ConfluenceOrganizeCommand(), as: "confluence-organize")
+    app.commands.use(ConfluenceOrganizeCommand(), as: "confluence-organize")
     
     try routes(app)
 }

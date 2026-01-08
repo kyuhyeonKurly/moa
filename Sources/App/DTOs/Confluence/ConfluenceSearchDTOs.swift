@@ -85,3 +85,78 @@ struct ConfluencePageNode {
     var createdDate: String? { page.history?.createdDate }
     var createdBy: String? { page.history?.createdBy?.displayName }
 }
+
+// MARK: - Confluence Update Requests
+
+struct ConfluencePageUpdateRequest: Content {
+    let id: String?
+    let type: String
+    let title: String?
+    let space: ConfluenceSpaceReference
+    let status: String?
+    let body: ConfluencePageBody?
+    let version: ConfluencePageVersion?
+    let ancestors: [ConfluenceAncestor]?
+}
+
+struct ConfluenceSpaceReference: Content {
+    let key: String
+}
+
+struct ConfluencePageBody: Content {
+    let storage: ConfluenceStorage
+}
+
+struct ConfluenceStorage: Content {
+    let value: String
+    let representation: String
+}
+
+struct ConfluencePageVersion: Content {
+    let number: Int
+    let minorEdit: Bool
+}
+
+struct ConfluenceAncestor: Content {
+    let id: String
+    let type: String
+    let title: String
+}
+
+// MARK: - Confluence Update Response
+
+struct ConfluencePageUpdateResponse: Content {
+    let id: String
+    let type: String
+    let status: String
+    let title: String
+    let space: ConfluenceSpace?
+    let history: ConfluenceHistory?
+    let version: ConfluencePageVersion?
+}
+
+// MARK: - Confluence Organization Rules
+
+struct ConfluenceOrganizationRule: Codable {
+    enum ActionType: String, Codable {
+        case move = "move"
+        case rename = "rename"
+        case addLabel = "addLabel"
+        case archive = "archive"
+    }
+    
+    let action: ActionType
+    let condition: String
+    let target: String
+    let description: String
+}
+
+struct ConfluenceOrganizationResult: Codable {
+    let pageId: String
+    let title: String
+    let action: ConfluenceOrganizationRule.ActionType
+    let oldLocation: String?
+    let newLocation: String?
+    let status: String // "success" | "failed" | "skipped"
+    let message: String?
+}
