@@ -48,6 +48,19 @@ enum RoundupWikiRenderer {
         var html = "<p><strong>\(context.halfLabel)</strong> 완료 티켓 취합 · \(esc(userName))"
         if let p = context.platform { html += " · \(esc(p))" }
         html += " · 총 \(context.totalCount)건</p>"
+
+        // 맨 위 요약 (기획/기술=과제 수, KTLO/크래시/검토=건수)
+        let ktloTotal = context.ktlo.count + ktloGroups.reduce(0) { $0 + $1.ticketCount }
+        html += "<h2>📌 요약</h2><ul>"
+        html += "<li>🎯 <strong>기획과제</strong> \(planning.count)건</li>"
+        html += "<li>🛠 <strong>기술과제</strong> \(technical.count)건</li>"
+        html += "<li>🔧 <strong>KTLO</strong> \(ktloTotal)건</li>"
+        html += "<li>💥 <strong>크래시 대응</strong> \(context.crash.count)건</li>"
+        if !context.unversioned.isEmpty {
+            html += "<li>❓ <strong>검토 필요</strong> \(context.unversioned.count)건</li>"
+        }
+        html += "</ul>"
+
         html += "<p><em>※ 귀속 기준: fixVersion 실제 배포일(GitHub Releases). 버전 없는 인프라/백엔드 작업은 완료일 기준. 분류는 최상위 과제의 기획과제/기술과제/KTLO 라벨 기준(자동), 무라벨은 사람이 확정.</em></p>"
         html += epicSection("🎯 기획과제", planning)
         html += epicSection("🛠 기술과제", technical)
