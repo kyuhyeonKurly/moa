@@ -29,11 +29,10 @@ struct RoundupService {
         let assigneeClause = (request.assignee?.isEmpty == false)
             ? "assignee = \"\(request.assignee!)\"" : "assignee = currentUser()"
         // status "CLOSE"(취소/드랍)는 제외 — 완료(DONE)만 집계. (둘 다 statusCategory=done(green))
-        // 하위 작업(sub-task)은 제외 — 성과 단위는 스토리/작업/버그/에픽. 하위 작업은
-        // 부모 스토리의 분해라 개별 집계 시 중복(예: KMA-7711 하위 7712/7726/7727/7743).
+        // 하위 작업(sub-task)도 수집한다 — 크래시(KMA-8165)처럼 내 성과가 에픽 하위 sub-task로
+        // 달리는 경우가 많아 제외하면 대량 누락. (7711 하위 중복은 이 sub-task 문제와 별개로 다룸)
         let jql = """
         \(assigneeClause) AND project = KMA AND statusCategory = Done AND status != "CLOSE" \
-        AND issuetype in standardIssueTypes() \
         AND resolutiondate >= "\(winStart)" AND resolutiondate <= "\(winEnd)" \
         ORDER BY resolutiondate ASC
         """
