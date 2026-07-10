@@ -56,11 +56,17 @@ struct RoundupService {
         var ktlo: [RoundupTicket] = []
         var crash: [RoundupTicket] = []
         var unversioned: [RoundupTicket] = []
-        // 기획/기술 미분류: rootKey → (root 정보 + leaf 티켓들)
-        var groups: [String: (root: JiraIssue?, key: String, tickets: [RoundupTicket], leafSummaries: [String])] = [:]
+        var includedCount = 0
+        // 기획/기술 과제: rootKey → 누적. root 자신은 헤더라 tickets에서 제외(자기중복 방지).
+        struct GroupAcc {
+            var root: JiraIssue?
+            var tickets: [RoundupTicket] = []
+            var leafSummaries: [String] = []
+            var autoCat: RoundupClassifier.AutoBucket = .unclassified
+        }
+        var groups: [String: GroupAcc] = [:]
 
         for leaf in leaves {
-            // 반기 귀속 판정
             let attribution = attribute(leaf: leaf, known: known, platform: platform,
                                         halfStart: halfStart, halfEndExclusive: halfEndExclusive)
             switch attribution {
@@ -70,6 +76,7 @@ struct RoundupService {
                 unversioned.append(makeTicket(leaf, versionName: nil, shipDate: nil))
                 continue
             case let .included(versionName, shipDate):
+                includedCount += 1
                 let ticket = makeTicket(leaf, versionName: versionName, shipDate: shipDate)
                 let rKey = rootKey(of: leaf.key, known: known)
                 let root = known[rKey]
@@ -81,33 +88,48 @@ struct RoundupService {
                 switch bucket {
                 case .ktlo:  ktlo.append(ticket)
                 case .crash: crash.append(ticket)
-                case .unclassified:
-                    var g = groups[rKey] ?? (root: root, key: rKey, tickets: [], leafSummaries: [])
-                    g.tickets.append(ticket)
-                    g.leafSummaries.append(leaf.fields.summary)
+                case .planning, .technical, .unclassified:
+                    var g = groups[rKey] ?? GroupAcc(root: root, autoCat: bucket)
+                    if leaf.key != rKey { // root 자신은 헤더이므로 하위 목록에서 제외
+                        g.tickets.append(ticket)
+                        g.leafSummaries.append(leaf.fields.summary)
+                    }
                     groups[rKey] = g
                 }
             }
         }
 
-        // 그룹 → RoundupEpicGroup (프리필 포함), 티켓 수 desc 정렬
-        let unclassified: [RoundupEpicGroup] = groups.values.map { g in
-            let rootSummary = g.root?.fields.summary ?? g.tickets.first?.summary ?? g.key
-            let guess = RoundupClassifier.guessPlanningOrTechnical(
-                epicSummary: rootSummary, leafSummaries: g.leafSummaries
-            )
+        // 그룹 → RoundupEpicGroup
+        func build(_ key: String, _ g: GroupAcc) -> RoundupEpicGroup {
+            let rootSummary = g.root?.fields.summary ?? g.tickets.first?.summary ?? key
+            let locked = (g.autoCat == .planning || g.autoCat == .technical)
+            let category: String
+            let lockedLabel: String?
+            switch g.autoCat {
+            case .planning:  category = "planning";  lockedLabel = RoundupClassifier.planningLabel
+            case .technical: category = "technical"; lockedLabel = RoundupClassifier.technicalLabel
+            default:
+                category = RoundupClassifier.guessPlanningOrTechnical(
+                    epicSummary: rootSummary, leafSummaries: g.leafSummaries).rawValue
+                lockedLabel = nil
+            }
             return RoundupEpicGroup(
-                epicKey: g.key,
+                epicKey: key,
                 epicSummary: rootSummary,
-                epicLink: "\(apiClient.apiBaseURL)/browse/\(g.key)",
-                guess: guess.rawValue,
+                epicLink: "\(apiClient.apiBaseURL)/browse/\(key)",
+                category: category,
+                locked: locked,
+                lockedLabel: locked ? lockedLabel : nil,
                 tickets: g.tickets.sorted { $0.key < $1.key },
                 ticketCount: g.tickets.count
             )
         }
-        .sorted { ($0.ticketCount, $1.epicKey) > ($1.ticketCount, $0.epicKey) }
-
-        let total = ktlo.count + crash.count + unversioned.count + unclassified.reduce(0) { $0 + $1.ticketCount }
+        let allGroups = groups.map { build($0.key, $0.value) }
+        func sortGroups(_ arr: [RoundupEpicGroup]) -> [RoundupEpicGroup] {
+            arr.sorted { ($0.ticketCount, $1.epicKey) > ($1.ticketCount, $0.epicKey) }
+        }
+        let planning = sortGroups(allGroups.filter { $0.category == "planning" })
+        let technical = sortGroups(allGroups.filter { $0.category == "technical" })
 
         return RoundupContext(
             year: request.year,
@@ -115,14 +137,16 @@ struct RoundupService {
             halfLabel: Self.halfLabel(year: request.year, half: request.half),
             platform: platform.isEmpty ? nil : platform,
             spaceKey: request.spaceKey,
-            totalCount: total,
+            totalCount: includedCount,
+            planning: planning,
+            technical: technical,
             ktlo: ktlo.sorted { $0.shipDateText < $1.shipDateText },
             crash: crash.sorted { $0.shipDateText < $1.shipDateText },
-            unclassified: unclassified,
             unversioned: unversioned,
+            planningCount: planning.count,
+            technicalCount: technical.count,
             ktloCount: ktlo.count,
             crashCount: crash.count,
-            unclassifiedCount: unclassified.reduce(0) { $0 + $1.ticketCount },
             unversionedCount: unversioned.count
         )
     }
@@ -186,11 +210,37 @@ struct RoundupService {
         return []
     }
 
-    /// 부모 체인을 타고 올라가 최상위(알고 있는) 티켓 key 반환.
-    private func rootKey(of key: String, known: [String: JiraIssue]) -> String {
+    /// 노드 자신의 fixVersion 식별자(semver 집합, 플랫폼 무관). 없으면 nil.
+    private func ownVersionKey(_ issue: JiraIssue) -> String? {
+        guard let vs = issue.fields.fixVersions, !vs.isEmpty else { return nil }
+        let semvers = Set(vs.compactMap { ReleaseCalendar.parse(versionName: $0.name)?.version })
+        return semvers.isEmpty ? nil : semvers.sorted().joined(separator: ",")
+    }
+
+    /// leaf가 실제 실린 배포 버전(가장 가까운 own 버전). 없으면 nil.
+    private func shipVersionKey(of key: String, known: [String: JiraIssue]) -> String? {
         var cur = key
         var visited = Set<String>()
-        while let p = known[cur]?.fields.parent?.key, !visited.contains(cur), known[p] != nil {
+        while let issue = known[cur], !visited.contains(cur) {
+            if let k = ownVersionKey(issue) { return k }
+            visited.insert(cur)
+            guard let p = issue.fields.parent?.key else { break }
+            cur = p
+        }
+        return nil
+    }
+
+    /// 버전 인지 root: 부모를 타고 올라가되, **부모가 자기 버전을 갖고 그게 leaf 배포버전과 다르면**
+    /// 거기서 멈춘다 (분리 배포 = 독립 최상위). 수정버전 = 배포이므로 같은 버전끼리만 묶인다.
+    /// (이 프로젝트는 에픽이 버전을 보유하고 자식이 상속 → 공통 케이스는 에픽으로 롤업)
+    private func rootKey(of key: String, known: [String: JiraIssue]) -> String {
+        let shipVer = shipVersionKey(of: key, known: known)
+        var cur = key
+        var visited = Set<String>()
+        while let p = known[cur]?.fields.parent?.key, !visited.contains(cur), let parent = known[p] {
+            if let sv = shipVer, let pOwn = ownVersionKey(parent), pOwn != sv {
+                break // 부모는 다른 버전으로 배포됨 → cur가 이 배포의 최상위
+            }
             visited.insert(cur)
             cur = p
         }

@@ -18,6 +18,7 @@
         section.bucket h2 { font-size:1.15rem; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
         section.bucket .desc { color:#8a8a8e; font-size:.85rem; margin:0 0 14px; }
         .group { border:1px solid #ececf0; border-radius:10px; padding:12px 14px; margin-bottom:12px; }
+        .group.locked { background:#faf7fc; border-color:#e6d9ef; }
         .group .ghead { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
         .group .gtitle { font-weight:600; font-size:.98rem; }
         .group .gtitle a { color:var(--kurly); text-decoration:none; font-weight:700; }
@@ -25,19 +26,20 @@
         .radios { display:flex; gap:6px; margin-top:8px; }
         .radios label { border:1px solid #d2d2d7; border-radius:8px; padding:5px 12px; font-size:.85rem; cursor:pointer; user-select:none; }
         .radios input { display:none; }
-        .radios input:checked + span { }
         .radios label:has(input:checked) { background:var(--kurly); color:#fff; border-color:var(--kurly); }
+        .lockbadge { display:inline-block; margin-top:8px; background:var(--kurly); color:#fff; border-radius:8px; padding:5px 12px; font-size:.82rem; font-weight:600; }
         ul.tks { margin:10px 0 0; padding-left:18px; }
         ul.tks li { font-size:.9rem; margin:3px 0; }
         ul.tks li a { color:#0071e3; text-decoration:none; }
         ul.tks li .v { color:#a1a1a6; font-size:.8rem; margin-left:6px; }
         .empty { color:#b0b0b5; font-size:.9rem; }
         .footer-bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #e5e5ea; padding:14px 16px; box-shadow:0 -1px 6px rgba(0,0,0,.06); }
-        .footer-inner { max-width:860px; margin:0 auto; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-        .footer-inner input { flex:1; min-width:180px; padding:.7rem; border:1px solid #d2d2d7; border-radius:8px; font-size:.95rem; }
-        .btn { background:var(--kurly); color:#fff; border:none; border-radius:8px; padding:.8rem 1.4rem; font-size:.95rem; font-weight:700; cursor:pointer; white-space:nowrap; }
+        .footer-inner { max-width:860px; margin:0 auto; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+        .footer-inner input { flex:1; min-width:160px; padding:.7rem; border:1px solid #d2d2d7; border-radius:8px; font-size:.95rem; }
+        .btn { background:var(--kurly); color:#fff; border:none; border-radius:8px; padding:.8rem 1.2rem; font-size:.9rem; font-weight:700; cursor:pointer; white-space:nowrap; }
         .btn:disabled { opacity:.6; cursor:default; }
         .btn.ghost { background:#f0f0f2; color:#333; }
+        .btn.amber { background:#b06f00; }
     </style>
 </head>
 <body>
@@ -49,7 +51,8 @@
             </div>
             <div class="stats">
                 <span class="chip">총 #(totalCount)건</span>
-                <span class="chip">기획/기술 미분류 #(unclassifiedCount)</span>
+                <span class="chip">기획과제 #(planningCount)</span>
+                <span class="chip">기술과제 #(technicalCount)</span>
                 <span class="chip">KTLO #(ktloCount)</span>
                 <span class="chip">크래시 #(crashCount)</span>
                 <span class="chip gray">검토 #(unversionedCount)</span>
@@ -57,36 +60,67 @@
         </header>
 
         <section class="bucket">
-            <h2>🎯 기획 / 기술 과제</h2>
-            <p class="desc">최상위 에픽에 분류 라벨이 없어 자동 판정 불가 → 각 과제를 <strong>기획/기술/제외</strong>로 확정하세요. (아래는 제목 휴리스틱 <strong>프리필</strong>)</p>
-            #if(count(unclassified) == 0):
-            <p class="empty">해당 없음</p>
-            #endif
-            #for(g in unclassified):
-            <div class="group">
+            <h2>🎯 기획과제 <span class="gcount" style="font-weight:400;">#(planningCount)건</span></h2>
+            <p class="desc">🔒 = <code>기획과제</code>/<code>기술과제</code> 라벨이 이미 있어 자동 확정(수정 불가). 나머지는 프리필된 라디오로 확정 → "🏷 라벨 적용"으로 Jira에 write-back → 다음 반기 자동분류.</p>
+            #if(count(planning) == 0):<p class="empty">해당 없음</p>#endif
+            #for(g in planning):
+            <div class="group #if(g.locked):locked#endif">
                 <div class="ghead">
-                    <div class="gtitle">
-                        📌 <a href="#(g.epicLink)" target="_blank">#(g.epicKey)</a> #(g.epicSummary)
-                    </div>
-                    <div class="gcount">#(g.ticketCount)건</div>
+                    <div class="gtitle">📌 <a href="#(g.epicLink)" target="_blank">#(g.epicKey)</a> #(g.epicSummary)</div>
+                    <div class="gcount">#if(g.ticketCount > 0):하위 #(g.ticketCount)#endif</div>
                 </div>
-                <div class="radios" data-key="#(g.epicKey)">
-                    <label><input type="radio" name="d:#(g.epicKey)" value="planning" #if(g.guess == "planning"):checked#endif><span>기획과제</span></label>
-                    <label><input type="radio" name="d:#(g.epicKey)" value="technical" #if(g.guess == "technical"):checked#endif><span>기술과제</span></label>
+                #if(g.locked):
+                <span class="lockbadge">🔒 #(g.lockedLabel) · 라벨됨</span>
+                #else:
+                <div class="radios">
+                    <label><input type="radio" name="d:#(g.epicKey)" value="planning" #if(g.category == "planning"):checked#endif><span>기획과제</span></label>
+                    <label><input type="radio" name="d:#(g.epicKey)" value="technical" #if(g.category == "technical"):checked#endif><span>기술과제</span></label>
                     <label><input type="radio" name="d:#(g.epicKey)" value="excluded"><span>제외</span></label>
                 </div>
+                #endif
+                #if(g.ticketCount > 0):
                 <ul class="tks">
                     #for(t in g.tickets):
                     <li><a href="#(t.link)" target="_blank">#(t.key)</a> #(t.summary)<span class="v">#(t.versionLabel) · #(t.shipDateText)</span></li>
                     #endfor
                 </ul>
+                #endif
+            </div>
+            #endfor
+        </section>
+
+        <section class="bucket">
+            <h2>🛠 기술과제 <span class="gcount" style="font-weight:400;">#(technicalCount)건</span></h2>
+            #if(count(technical) == 0):<p class="empty">해당 없음</p>#endif
+            #for(g in technical):
+            <div class="group #if(g.locked):locked#endif">
+                <div class="ghead">
+                    <div class="gtitle">📌 <a href="#(g.epicLink)" target="_blank">#(g.epicKey)</a> #(g.epicSummary)</div>
+                    <div class="gcount">#if(g.ticketCount > 0):하위 #(g.ticketCount)#endif</div>
+                </div>
+                #if(g.locked):
+                <span class="lockbadge">🔒 #(g.lockedLabel) · 라벨됨</span>
+                #else:
+                <div class="radios">
+                    <label><input type="radio" name="d:#(g.epicKey)" value="planning" #if(g.category == "planning"):checked#endif><span>기획과제</span></label>
+                    <label><input type="radio" name="d:#(g.epicKey)" value="technical" #if(g.category == "technical"):checked#endif><span>기술과제</span></label>
+                    <label><input type="radio" name="d:#(g.epicKey)" value="excluded"><span>제외</span></label>
+                </div>
+                #endif
+                #if(g.ticketCount > 0):
+                <ul class="tks">
+                    #for(t in g.tickets):
+                    <li><a href="#(t.link)" target="_blank">#(t.key)</a> #(t.summary)<span class="v">#(t.versionLabel) · #(t.shipDateText)</span></li>
+                    #endfor
+                </ul>
+                #endif
             </div>
             #endfor
         </section>
 
         <section class="bucket">
             <h2>🔧 KTLO <span class="gcount" style="font-weight:400; color:#8a8a8e;">(자동)</span></h2>
-            <p class="desc">KTLO 라벨 에픽(분기별)의 하위 운영 작업. 개별 티켓 나열.</p>
+            <p class="desc">KTLO 라벨 에픽(분기별)의 하위 운영 작업.</p>
             #if(count(ktlo) == 0):<p class="empty">해당 없음</p>#endif
             <ul class="tks">
                 #for(t in ktlo):
@@ -123,41 +157,53 @@
         <div class="footer-inner">
             <input type="text" id="spaceKey" placeholder="Confluence Space Key (예: ~616f8e...)" value="#(spaceKey)">
             <button class="btn ghost" onclick="location.href='/moa/'">홈</button>
+            <button class="btn amber" id="labelBtn" onclick="applyLabels()">🏷 라벨 적용</button>
             <button class="btn" id="wikiBtn" onclick="createWiki()">📝 위키 초안 생성</button>
         </div>
     </div>
 
     <script>
+        const YEAR = #(year), HALF = #(half), PLATFORM = "#if(platform):#(platform)#endif";
+
+        function collectDecisions() {
+            const d = {};
+            document.querySelectorAll('input[type=radio]:checked').forEach(r => {
+                if (r.name.indexOf('d:') === 0) d[r.name.substring(2)] = r.value;
+            });
+            return d;
+        }
+
+        async function applyLabels() {
+            if (!confirm('무라벨 과제에 기획과제/기술과제 라벨을 Jira에 실제로 부착합니다.\n(라벨 있는 건·제외는 건너뜀) 진행할까요?')) return;
+            const btn = document.getElementById('labelBtn');
+            btn.disabled = true; btn.innerText = '적용 중...';
+            try {
+                const res = await fetch('/moa/roundup/labels', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ year: YEAR, half: HALF, platform: PLATFORM, decisions: collectDecisions() })
+                });
+                if (!res.ok) { const t = await res.text(); let m=t; try{const j=JSON.parse(t); if(j.reason)m=j.reason;}catch(e){} throw new Error(m); }
+                const j = await res.json();
+                btn.innerText = '✅ ' + j.applied + '건 적용';
+                alert('라벨 적용 ' + j.applied + '건 · 건너뜀 ' + j.skipped + '건\n\n' + (j.details || []).join('\n'));
+            } catch (e) { alert('라벨 적용 실패: ' + e.message); btn.disabled = false; btn.innerText = '🏷 라벨 적용'; }
+        }
+
         async function createWiki() {
             const spaceKey = document.getElementById('spaceKey').value.trim();
             if (!spaceKey) { alert('Confluence Space Key를 입력하세요.'); return; }
-            const decisions = {};
-            document.querySelectorAll('input[type=radio]:checked').forEach(r => {
-                if (r.name.indexOf('d:') === 0) decisions[r.name.substring(2)] = r.value;
-            });
             const btn = document.getElementById('wikiBtn');
             btn.disabled = true; btn.innerText = '생성 중...';
             try {
                 const res = await fetch('/moa/roundup/wiki', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        year: #(year), half: #(half), platform: "#if(platform):#(platform)#endif",
-                        spaceKey: spaceKey, decisions: decisions
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ year: YEAR, half: HALF, platform: PLATFORM, spaceKey: spaceKey, decisions: collectDecisions() })
                 });
-                if (!res.ok) {
-                    const t = await res.text();
-                    let msg = t; try { const j = JSON.parse(t); if (j.reason) msg = j.reason; } catch(e){}
-                    throw new Error(msg);
-                }
+                if (!res.ok) { const t = await res.text(); let m=t; try{const j=JSON.parse(t); if(j.reason)m=j.reason;}catch(e){} throw new Error(m); }
                 const j = await res.json();
                 btn.innerText = '✅ 생성됨 — 새 탭에서 열기';
                 window.open(j.editUrl, '_blank');
-            } catch (e) {
-                alert('생성 실패: ' + e.message);
-                btn.disabled = false; btn.innerText = '📝 위키 초안 생성';
-            }
+            } catch (e) { alert('생성 실패: ' + e.message); btn.disabled = false; btn.innerText = '📝 위키 초안 생성'; }
         }
     </script>
 </body>

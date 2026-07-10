@@ -65,9 +65,7 @@ struct RoundupWikiCommand: Command {
                     token: token
                 )
                 box.editUrl = "https://kurly0521.atlassian.net/wiki/spaces/\(space)/pages/edit-v2/\(pageId)"
-                let planning = ctx.unclassified.filter { $0.guess == "planning" }.reduce(0) { $0 + $1.ticketCount }
-                let technical = ctx.unclassified.filter { $0.guess == "technical" }.reduce(0) { $0 + $1.ticketCount }
-                box.summary = "총 \(ctx.totalCount) · 기획 \(planning) · 기술 \(technical) · KTLO \(ctx.ktloCount) · 크래시 \(ctx.crashCount) · 검토 \(ctx.unversionedCount)"
+                box.summary = "총 \(ctx.totalCount) · 기획과제 \(ctx.planningCount) · 기술과제 \(ctx.technicalCount) · KTLO \(ctx.ktloCount) · 크래시 \(ctx.crashCount) · 검토 \(ctx.unversionedCount)"
             } catch {
                 box.error = "\(error)"
             }

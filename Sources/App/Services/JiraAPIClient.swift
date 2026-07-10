@@ -45,6 +45,23 @@ final class JiraAPIClient: Sendable {
         return try response.content.decode([JiraProjectVersion].self)
     }
 
+    /// 이슈에 라벨 추가 (write-back). 이미 있으면 Jira가 멱등 처리.
+    func addLabel(issueKey: String, label: String) async throws {
+        let uri = URI(string: "\(apiBaseURL)/rest/api/3/issue/\(issueKey)")
+        struct LabelUpdate: Content {
+            struct Op: Content { let add: String }
+            let update: [String: [Op]]
+        }
+        let body = LabelUpdate(update: ["labels": [.init(add: label)]])
+        let response = try await client.put(uri, headers: headers) { req in
+            try req.content.encode(body)
+        }
+        guard response.status == .noContent || response.status == .ok else {
+            let b = response.body.map { String(buffer: $0) } ?? "No body"
+            throw Abort(.internalServerError, reason: "라벨 추가 실패 \(issueKey) (\(response.status)): \(b)")
+        }
+    }
+
     func searchIssues(jql: String, fields: [String], maxResults: Int, nextPageToken: String?) async throws -> JiraSearchResponse {
         let uri = URI(string: "\(apiBaseURL)/rest/api/3/search/jql")
         let searchRequest = JiraSearchRequest(

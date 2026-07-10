@@ -20,6 +20,7 @@ struct MoaController: RouteCollection {
         roundup.post(use: showRoundupLoading)
         roundup.post("api", use: generateRoundup)
         roundup.post("wiki", use: createRoundupDraft)
+        roundup.post("labels", use: applyRoundupLabels)
     }
 
     func index(req: Request) async throws -> View {
@@ -224,6 +225,45 @@ struct MoaController: RouteCollection {
         )
         let editUrl = "https://kurly0521.atlassian.net/wiki/spaces/\(body.spaceKey)/pages/edit-v2/\(pageId)"
         return RoundupDraftResponse(editUrl: editUrl)
+    }
+
+    /// 라벨 write-back — 무라벨 root에 기획과제/기술과제 라벨을 Jira에 실제 부착.
+    /// 이미 라벨된(locked) 건·제외 건은 skip. → 다음 반기부터 자동분류.
+    func applyRoundupLabels(req: Request) async throws -> RoundupLabelResponse {
+        let body = try req.content.decode(RoundupLabelRequest.self)
+        guard let email = req.cookies["moa_email"]?.string,
+              let token = req.cookies["moa_token"]?.string else {
+            throw Abort(.unauthorized, reason: "로그인이 필요합니다.")
+        }
+        let jiraClient = JiraAPIClient(client: req.client, email: email, token: token)
+        let calendar = try ReleaseCalendar.load(on: req.application)
+        let service = RoundupService(apiClient: jiraClient, calendar: calendar, logger: req.logger)
+
+        let recollect = RoundupRequest(
+            year: body.year, half: body.half, platform: body.platform,
+            assignee: nil, email: email, token: token, spaceKey: nil
+        )
+        let context = try await service.collect(request: recollect)
+        let decisions = body.decisions ?? [:]
+
+        var applied = 0
+        var skipped = 0
+        var details: [String] = []
+        for g in (context.planning + context.technical) {
+            if g.locked { skipped += 1; continue } // 이미 라벨됨
+            let decided = decisions[g.epicKey] ?? g.category
+            guard decided == "planning" || decided == "technical" else { skipped += 1; continue } // 제외 등
+            let label = (decided == "planning") ? RoundupClassifier.planningLabel : RoundupClassifier.technicalLabel
+            do {
+                try await jiraClient.addLabel(issueKey: g.epicKey, label: label)
+                applied += 1
+                details.append("\(g.epicKey) → \(label)")
+            } catch {
+                skipped += 1
+                details.append("\(g.epicKey) ✗ \(error)")
+            }
+        }
+        return RoundupLabelResponse(applied: applied, skipped: skipped, details: details)
     }
 
     /// 4섹션(기획/기술/KTLO/크래시) + 검토 섹션 Confluence Storage HTML 생성.

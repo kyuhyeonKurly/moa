@@ -10,20 +10,28 @@ enum RoundupWikiRenderer {
              .replacingOccurrences(of: "<", with: "&lt;")
              .replacingOccurrences(of: ">", with: "&gt;")
         }
-        func decision(_ g: RoundupEpicGroup) -> String { decisions[g.epicKey] ?? g.guess }
-        let planning = context.unclassified.filter { decision($0) == "planning" }
-        let technical = context.unclassified.filter { decision($0) == "technical" }
+        // 라벨된(locked) 건 확정 → decisions 무시. 무라벨만 사람 결정(decisions) 반영, "excluded"는 제외.
+        func finalCategory(_ g: RoundupEpicGroup) -> String {
+            g.locked ? g.category : (decisions[g.epicKey] ?? g.category)
+        }
+        let allGroups = context.planning + context.technical
+        let planning = allGroups.filter { finalCategory($0) == "planning" }
+        let technical = allGroups.filter { finalCategory($0) == "technical" }
 
         func epicSection(_ title: String, _ groups: [RoundupEpicGroup]) -> String {
-            var s = "<h2>\(title)</h2>"
+            var s = "<h2>\(title) (\(groups.count)건)</h2>"
             if groups.isEmpty { return s + "<p>-</p>" }
             for g in groups {
                 let link = g.epicLink ?? "https://kurly0521.atlassian.net/browse/\(g.epicKey)"
-                s += "<p>📌 <a href=\"\(link)\">\(g.epicKey)</a> <strong>\(esc(g.epicSummary))</strong> (\(g.ticketCount)건)</p><ul>"
-                for t in g.tickets {
-                    s += "<li><a href=\"\(t.link)\">\(t.key)</a> \(esc(t.summary))</li>"
+                let sub = g.ticketCount > 0 ? " (하위 \(g.ticketCount))" : ""
+                s += "<p>📌 <a href=\"\(link)\">\(g.epicKey)</a> <strong>\(esc(g.epicSummary))</strong>\(sub)</p>"
+                if !g.tickets.isEmpty {
+                    s += "<ul>"
+                    for t in g.tickets {
+                        s += "<li><a href=\"\(t.link)\">\(t.key)</a> \(esc(t.summary))</li>"
+                    }
+                    s += "</ul>"
                 }
-                s += "</ul>"
             }
             return s
         }
@@ -38,9 +46,9 @@ enum RoundupWikiRenderer {
         var html = "<p><strong>\(context.halfLabel)</strong> 완료 티켓 취합 · \(esc(userName))"
         if let p = context.platform { html += " · \(esc(p))" }
         html += " · 총 \(context.totalCount)건</p>"
-        html += "<p><em>※ 귀속 기준: fixVersion 실제 배포일(GitHub Releases). 버전 없는 인프라/백엔드 작업은 완료일 기준. 기획/기술은 제목 휴리스틱 프리필이라 확정이 필요하고, KTLO·크래시는 에픽 기준 자동 분류.</em></p>"
-        html += epicSection("🎯 기획과제 (프리필 · 확정 필요)", planning)
-        html += epicSection("🛠 기술과제 (프리필 · 확정 필요)", technical)
+        html += "<p><em>※ 귀속 기준: fixVersion 실제 배포일(GitHub Releases). 버전 없는 인프라/백엔드 작업은 완료일 기준. 분류는 최상위 과제의 기획과제/기술과제/KTLO 라벨 기준(자동), 무라벨은 사람이 확정.</em></p>"
+        html += epicSection("🎯 기획과제", planning)
+        html += epicSection("🛠 기술과제", technical)
         html += flatSection("🔧 KTLO", context.ktlo)
         html += flatSection("💥 크래시 대응", context.crash)
         if !context.unversioned.isEmpty {

@@ -33,10 +33,23 @@ struct RoundupWikiRequest: Content {
     let half: Int
     let platform: String?
     let spaceKey: String
-    /// epicKey → "planning" | "technical" | "excluded"
+    /// rootKey → "planning" | "technical" | "excluded"
     let decisions: [String: String]?
-    /// 고아(에픽 없음) 티켓 key → "planning" | "technical" | "excluded"
-    let orphanDecisions: [String: String]?
+}
+
+/// 라벨 write-back 요청 — 무라벨 root에 기획과제/기술과제 라벨을 Jira에 부착.
+struct RoundupLabelRequest: Content {
+    let year: Int
+    let half: Int
+    let platform: String?
+    /// rootKey → "planning" | "technical" | "excluded"
+    let decisions: [String: String]?
+}
+
+struct RoundupLabelResponse: Content {
+    let applied: Int
+    let skipped: Int
+    let details: [String]   // "KMA-7674 → 기획과제" 등
 }
 
 // MARK: - View Context
@@ -50,14 +63,16 @@ struct RoundupTicket: Content {
     let shipDateText: String     // "06/23"
 }
 
-/// 기획/기술 미분류 그룹 (root 에픽/최상위 티켓 단위). 프리필 추정값 포함.
+/// 기획/기술 과제 그룹 (root = 최상위 배포 단위).
 struct RoundupEpicGroup: Content {
-    let epicKey: String          // 최상위(root) 티켓 key — 고아면 leaf 자신
+    let epicKey: String          // 최상위(root) 티켓 key
     let epicSummary: String
     let epicLink: String?
-    let guess: String            // "planning" | "technical" (프리필)
-    let tickets: [RoundupTicket]
-    let ticketCount: Int
+    let category: String         // "planning" | "technical" (라벨 or 프리필)
+    let locked: Bool             // 라벨이 이미 있어 확정됨(수정 불가 · write-back 제외)
+    let lockedLabel: String?     // "기획과제" | "기술과제" (locked일 때 표시)
+    let tickets: [RoundupTicket] // 하위 작업 (root 자신 제외)
+    let ticketCount: Int         // 하위 작업 수
 }
 
 struct RoundupContext: Content {
@@ -68,14 +83,16 @@ struct RoundupContext: Content {
     let spaceKey: String?
 
     let totalCount: Int          // 반기 귀속된 내 leaf 총계
+    let planning: [RoundupEpicGroup]   // 기획 과제
+    let technical: [RoundupEpicGroup]  // 기술 과제
     let ktlo: [RoundupTicket]
     let crash: [RoundupTicket]
-    let unclassified: [RoundupEpicGroup]   // 기획/기술 (프리필 + 사람 확정)
-    let unversioned: [RoundupTicket]       // 미배포/버전없음 — 검토
+    let unversioned: [RoundupTicket]   // 미배포/버전없음 — 검토
 
-    // 섹션별 카운트 (뷰 헤더용)
+    // 섹션별 카운트 (뷰 헤더용) — 기획/기술은 "과제(그룹) 수"
+    let planningCount: Int
+    let technicalCount: Int
     let ktloCount: Int
     let crashCount: Int
-    let unclassifiedCount: Int
     let unversionedCount: Int
 }

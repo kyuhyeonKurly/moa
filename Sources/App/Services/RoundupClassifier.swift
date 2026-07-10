@@ -10,35 +10,43 @@ enum RoundupCategory: String, Codable {
     case excluded     // 제외 (사람이 뺀 항목)
 }
 
-/// root 에픽의 정체로 버킷을 판정하는 순수 로직.
+/// root(최상위 배포 단위)의 정체로 버킷을 판정하는 순수 로직.
 ///
-/// 발굴 결과(2026-07 실데이터): 기획/기술을 구분하는 라벨은 **존재하지 않는다**.
-/// 일관 라벨은 KTLO 하나뿐이고, 크래시는 연간 운영 에픽(KMA-8165)로 관리된다.
-/// 따라서 KTLO·크래시만 자동 분류하고, 나머지는 "미분류"로 두어 사람이 기획/기술을
-/// 확정한다. 다만 사람 손을 줄이기 위해 제목 휴리스틱으로 기획/기술을 **프리필**한다
-/// (결정론 규칙 — LLM 추론 아님, 사람이 최종 확정).
+/// 분류 신호는 **root의 Jira 라벨**이다 (KMA-8276/8165 거버넌스: 얼라인된 것만 가치창출):
+///  - `KTLO`        → KTLO (분기별 운영 에픽)
+///  - 크래시 에픽    → 크래시 (KMA-8165 계열)
+///  - `기획과제`     → 기획 (자동·확정)
+///  - `기술과제`     → 기술 (자동·확정)
+///  - 그 외/무라벨   → 미분류 → 제목 휴리스틱 프리필 후 **사람 확정**(→ write-back)
+///
+/// `개발과제`는 폐기된 라벨이라 자동 매핑하지 않는다(무라벨과 동일 취급, 얼라인 안 되면 KTLO).
 enum RoundupClassifier {
 
     /// 크래시 연간 운영 에픽. 미래 [2027] 크래시 대응 등은 제목 패턴으로도 잡는다.
     static let crashEpicKeys: Set<String> = ["KMA-8165"]
 
+    static let planningLabel = "기획과제"
+    static let technicalLabel = "기술과제"
+
     enum AutoBucket {
         case ktlo
         case crash
-        case unclassified  // 기획/기술 (라벨 없음 → 사람 확정 대상)
+        case planning      // 기획과제 라벨 → 자동·확정(locked)
+        case technical     // 기술과제 라벨 → 자동·확정(locked)
+        case unclassified  // 무라벨 → 사람 확정 대상(프리필)
     }
 
-    /// root 에픽 라벨/키/제목으로 자동 버킷 판정.
+    private static func hasLabel(_ labels: [String], _ target: String) -> Bool {
+        labels.contains { $0.caseInsensitiveCompare(target) == .orderedSame }
+    }
+
+    /// root 라벨/키/제목으로 자동 버킷 판정.
     static func autoBucket(rootLabels: [String], rootKey: String?, rootSummary: String?) -> AutoBucket {
-        if rootLabels.contains(where: { $0.caseInsensitiveCompare("KTLO") == .orderedSame }) {
-            return .ktlo
-        }
-        if let k = rootKey, crashEpicKeys.contains(k) {
-            return .crash
-        }
-        if let s = rootSummary, s.contains("크래시 대응") {
-            return .crash
-        }
+        if hasLabel(rootLabels, "KTLO") { return .ktlo }
+        if let k = rootKey, crashEpicKeys.contains(k) { return .crash }
+        if let s = rootSummary, s.contains("크래시 대응") { return .crash }
+        if hasLabel(rootLabels, planningLabel) { return .planning }
+        if hasLabel(rootLabels, technicalLabel) { return .technical }
         return .unclassified
     }
 
