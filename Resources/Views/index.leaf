@@ -94,7 +94,7 @@
                 <label for="epicOverrides">분류 지정 에픽 (선택)</label>
                 <textarea id="epicOverrides" name="epicOverrides" rows="3" style="width:100%; padding:0.8rem; border:1px solid #d2d2d7; border-radius:8px; font-size:0.9rem; box-sizing:border-box; font-family:inherit;">기술: KMA-8172, KMA-8594, KMA-8265, KMA-6393, KMA-8266</textarea>
                 <div class="help-text">
-                    <p style="margin:0.2rem 0;">공통 팀 에픽 지정 — 하위 티켓이 이 에픽으로 묶여 자동 분류(버전 분리 안 함).</p>
+                    <p style="margin:0.2rem 0;"><strong>공통 기술과제</strong>(여러 담당자가 하위에 붙이는 팀 상위 에픽) 지정 — 하위 티켓이 이 에픽으로 묶여 자동 분류(버전 분리 안 함).</p>
                     <p style="margin:0.2rem 0;">형식: <code>카테고리: KMA-키, KMA-키</code> (줄 단위 · 링크도 OK). 카테고리 = 기획/기술/KTLO.</p>
                 </div>
             </div>

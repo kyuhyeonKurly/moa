@@ -65,6 +65,7 @@ struct RoundupService {
             var tickets: [RoundupTicket] = []
             var leafSummaries: [String] = []
             var autoCat: RoundupClassifier.AutoBucket = .unclassified
+            var designated = false   // 지정 에픽(override) = 공통 기술/기획과제
         }
         var groups: [String: GroupAcc] = [:]
 
@@ -91,6 +92,7 @@ struct RoundupService {
                         let ac: RoundupClassifier.AutoBucket = (dCat == "planning") ? .planning : .technical
                         var g = groups[dKey] ?? GroupAcc(root: known[dKey], autoCat: ac)
                         g.autoCat = ac
+                        g.designated = true
                         if leaf.key != dKey { g.tickets.append(ticket); g.leafSummaries.append(leaf.fields.summary) }
                         groups[dKey] = g
                     default:
@@ -127,8 +129,8 @@ struct RoundupService {
             let category: String
             let lockedLabel: String?
             switch g.autoCat {
-            case .planning:  category = "planning";  lockedLabel = RoundupClassifier.planningLabel
-            case .technical: category = "technical"; lockedLabel = RoundupClassifier.technicalLabel
+            case .planning:  category = "planning";  lockedLabel = g.designated ? "공통 기획과제" : RoundupClassifier.planningLabel
+            case .technical: category = "technical"; lockedLabel = g.designated ? "공통 기술과제" : RoundupClassifier.technicalLabel
             default:
                 category = RoundupClassifier.guessPlanningOrTechnical(
                     epicSummary: rootSummary, leafSummaries: g.leafSummaries).rawValue
