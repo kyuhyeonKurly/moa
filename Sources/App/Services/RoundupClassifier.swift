@@ -59,6 +59,44 @@ enum RoundupClassifier {
         return .planning
     }
 
+    /// "분류 지정 에픽" 입력 파싱 → [에픽키: 카테고리("planning"|"technical"|"ktlo")].
+    /// 줄 단위. 각 줄에서 카테고리 키워드(기획/기술/개발/KTLO) + 이슈키(KMA-123, 링크 포함) 추출.
+    static func parseEpicOverrides(_ text: String?) -> [String: String] {
+        guard let text = text, !text.isEmpty else { return [:] }
+        var map: [String: String] = [:]
+        for rawLine in text.split(whereSeparator: { $0 == "\n" || $0 == "\r" }) {
+            let line = String(rawLine)
+            let lower = line.lowercased()
+            let cat: String
+            if line.contains("기획") || lower.contains("planning") { cat = "planning" }
+            else if lower.contains("ktlo") { cat = "ktlo" }
+            else if line.contains("기술") || line.contains("개발") || lower.contains("technical") { cat = "technical" }
+            else { cat = "technical" } // 카테고리 미명시 시 기본 기술
+            for key in extractIssueKeys(line) { map[key] = cat }
+        }
+        return map
+    }
+
+    /// 문자열에서 이슈키(PROJ-123) 추출 (Jira 링크 안의 키도 잡힘).
+    static func extractIssueKeys(_ s: String) -> [String] {
+        var keys: [String] = []
+        let chars = Array(s)
+        var i = 0
+        while i < chars.count {
+            if chars[i].isLetter {
+                var j = i
+                while j < chars.count, chars[j].isLetter { j += 1 }
+                if j < chars.count, chars[j] == "-" {
+                    var k = j + 1
+                    while k < chars.count, chars[k].isNumber { k += 1 }
+                    if k > j + 1 { keys.append(String(chars[i..<k])); i = k; continue }
+                }
+                i = j
+            } else { i += 1 }
+        }
+        return keys
+    }
+
     /// 기술과제로 추정하는 결정론 마커 (소문자 비교).
     static let technicalMarkers: [String] = [
         "기술과제", "refactor", "리팩토링", "리팩터", "migration", "마이그레이션",

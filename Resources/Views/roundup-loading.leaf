@@ -28,6 +28,7 @@
     <div class="status">완료 티켓을 모아 분류하는 중입니다...</div>
     <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     <div class="progress-text" id="progressText">0%</div>
+    <textarea id="ovr" style="display:none;">#(epicOverrides)</textarea>
 
     <script>
         const payload = {
@@ -37,7 +38,8 @@
             assignee: "#(assignee)",
             email: "#(email)",
             token: "#(token)",
-            spaceKey: "#(spaceKey)"
+            spaceKey: "#(spaceKey)",
+            epicOverrides: (document.getElementById('ovr') || {}).value || ""
         };
 
         function updateProgress(percent) {

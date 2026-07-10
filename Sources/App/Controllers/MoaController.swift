@@ -152,6 +152,7 @@ struct MoaController: RouteCollection {
         let email = req.query[String.self, at: "email"] ?? req.content[String.self, at: "email"] ?? req.cookies["moa_email"]?.string ?? ""
         let token = req.query[String.self, at: "token"] ?? req.content[String.self, at: "token"] ?? req.cookies["moa_token"]?.string ?? ""
         let spaceKey = req.query[String.self, at: "spaceKey"] ?? req.content[String.self, at: "spaceKey"] ?? req.cookies["moa_space_key"]?.string ?? ""
+        let epicOverrides = req.query[String.self, at: "epicOverrides"] ?? req.content[String.self, at: "epicOverrides"] ?? ""
 
         return try await req.view.render("roundup-loading", [
             "year": "\(year)",
@@ -160,7 +161,8 @@ struct MoaController: RouteCollection {
             "assignee": assignee,
             "email": email,
             "token": token,
-            "spaceKey": spaceKey
+            "spaceKey": spaceKey,
+            "epicOverrides": epicOverrides
         ])
     }
 
@@ -207,7 +209,8 @@ struct MoaController: RouteCollection {
         // 표시와 동일한 데이터를 재수집 후, 사람이 확정한 분류를 적용
         let recollectRequest = RoundupRequest(
             year: body.year, half: body.half, platform: body.platform,
-            assignee: nil, email: email, token: token, spaceKey: body.spaceKey
+            assignee: nil, email: email, token: token, spaceKey: body.spaceKey,
+            epicOverrides: body.epicOverrides
         )
         let context = try await service.collect(request: recollectRequest)
 
@@ -244,7 +247,8 @@ struct MoaController: RouteCollection {
 
         let recollect = RoundupRequest(
             year: body.year, half: body.half, platform: body.platform,
-            assignee: nil, email: email, token: token, spaceKey: nil
+            assignee: nil, email: email, token: token, spaceKey: nil,
+            epicOverrides: body.epicOverrides
         )
         let context = try await service.collect(request: recollect)
         let decisions = body.decisions ?? [:]

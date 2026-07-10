@@ -24,6 +24,7 @@ struct RoundupService {
         _ = try await apiClient.getMyself()
 
         let platform = request.platform ?? ""
+        let overrides = RoundupClassifier.parseEpicOverrides(request.epicOverrides)
         let (winStart, winEnd) = Self.collectionWindow(year: request.year, half: request.half)
         let assigneeClause = (request.assignee?.isEmpty == false)
             ? "assignee = \"\(request.assignee!)\"" : "assignee = currentUser()"
@@ -79,6 +80,25 @@ struct RoundupService {
             case let .included(versionName, shipDate):
                 includedCount += 1
                 let ticket = makeTicket(leaf, versionName: versionName, shipDate: shipDate)
+
+                // 0) 지정 에픽 우선 — 하위를 그 에픽 컨테이너로 묶어 지정 카테고리 처리
+                //    (버전 분리·라벨·휴리스틱 무시. 공통 팀 에픽용)
+                if let (dKey, dCat) = designatedRoot(of: leaf.key, known: known, overrides: overrides) {
+                    switch dCat {
+                    case "ktlo":
+                        ktlo.append(ticket)
+                    case "planning", "technical":
+                        let ac: RoundupClassifier.AutoBucket = (dCat == "planning") ? .planning : .technical
+                        var g = groups[dKey] ?? GroupAcc(root: known[dKey], autoCat: ac)
+                        g.autoCat = ac
+                        if leaf.key != dKey { g.tickets.append(ticket); g.leafSummaries.append(leaf.fields.summary) }
+                        groups[dKey] = g
+                    default:
+                        break
+                    }
+                    continue
+                }
+
                 let rKey = rootKey(of: leaf.key, known: known)
                 let root = known[rKey]
                 let bucket = RoundupClassifier.autoBucket(
@@ -138,6 +158,7 @@ struct RoundupService {
             halfLabel: Self.halfLabel(year: request.year, half: request.half),
             platform: platform.isEmpty ? nil : platform,
             spaceKey: request.spaceKey,
+            epicOverrides: request.epicOverrides,
             totalCount: includedCount,
             planning: planning,
             technical: technical,
@@ -248,6 +269,22 @@ struct RoundupService {
             cur = p
         }
         return cur
+    }
+
+    /// 지정 에픽(overrides) 중 leaf의 조상 체인에서 **가장 상위** 지정 에픽 + 카테고리 반환.
+    /// 버전 무시(컨테이너로 묶음). 없으면 nil.
+    private func designatedRoot(of key: String, known: [String: JiraIssue], overrides: [String: String]) -> (String, String)? {
+        if overrides.isEmpty { return nil }
+        var result: (String, String)? = nil
+        var cur = key
+        var visited = Set<String>()
+        while known[cur] != nil, !visited.contains(cur) {
+            if let cat = overrides[cur] { result = (cur, cat) } // 위로 갈수록 갱신 → 최상위 지정 에픽이 최종
+            visited.insert(cur)
+            guard let p = known[cur]?.fields.parent?.key, p.hasPrefix("KMA-") else { break }
+            cur = p
+        }
+        return result
     }
 
     private func makeTicket(_ issue: JiraIssue, versionName: String?, shipDate: Date?) -> RoundupTicket {

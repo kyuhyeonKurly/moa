@@ -9,6 +9,8 @@ struct RoundupRequest: Content {
     let email: String
     let token: String
     let spaceKey: String?
+    /// 분류 지정 에픽 (선택). 줄 단위 "카테고리: KMA-키,키" — 지정 에픽 하위는 컨테이너로 묶어 자동 분류.
+    let epicOverrides: String?
 
     func validate() throws {
         guard (2000...2100).contains(year) else {
@@ -33,8 +35,9 @@ struct RoundupWikiRequest: Content {
     let half: Int
     let platform: String?
     let spaceKey: String
-    /// rootKey → "planning" | "technical" | "excluded"
+    /// rootKey → "planning" | "technical" | "ktlo" | "excluded"
     let decisions: [String: String]?
+    let epicOverrides: String?
 }
 
 /// 라벨 write-back 요청 — 무라벨 root에 기획과제/기술과제 라벨을 Jira에 부착.
@@ -42,8 +45,9 @@ struct RoundupLabelRequest: Content {
     let year: Int
     let half: Int
     let platform: String?
-    /// rootKey → "planning" | "technical" | "excluded"
+    /// rootKey → "planning" | "technical" | "ktlo" | "excluded"
     let decisions: [String: String]?
+    let epicOverrides: String?
 }
 
 struct RoundupLabelResponse: Content {
@@ -81,6 +85,7 @@ struct RoundupContext: Content {
     let halfLabel: String        // "2026년 상반기 (1~6월)"
     let platform: String?
     let spaceKey: String?
+    let epicOverrides: String?   // 리뷰 화면이 wiki/label 재요청에 되돌려 보내기 위함
 
     let totalCount: Int          // 반기 귀속된 내 leaf 총계
     let planning: [RoundupEpicGroup]   // 기획 과제

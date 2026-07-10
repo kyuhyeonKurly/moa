@@ -50,7 +50,8 @@ struct RoundupWikiCommand: Command {
                 let service = RoundupService(apiClient: jira, calendar: calendar, logger: app.logger)
                 let request = RoundupRequest(
                     year: year, half: half, platform: platform,
-                    assignee: nil, email: email, token: token, spaceKey: space
+                    assignee: nil, email: email, token: token, spaceKey: space,
+                    epicOverrides: nil
                 )
                 let ctx = try await service.collect(request: request)
                 let user = try await jira.getMyself()

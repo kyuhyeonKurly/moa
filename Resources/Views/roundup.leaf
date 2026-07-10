@@ -164,8 +164,10 @@
         </div>
     </div>
 
+    <textarea id="ovr" style="display:none;">#(epicOverrides)</textarea>
     <script>
         const YEAR = #(year), HALF = #(half), PLATFORM = "#if(platform):#(platform)#endif";
+        const OVERRIDES = (document.getElementById('ovr') || {}).value || "";
 
         function collectDecisions() {
             const d = {};
@@ -182,7 +184,7 @@
             try {
                 const res = await fetch('/moa/roundup/labels', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ year: YEAR, half: HALF, platform: PLATFORM, decisions: collectDecisions() })
+                    body: JSON.stringify({ year: YEAR, half: HALF, platform: PLATFORM, decisions: collectDecisions(), epicOverrides: OVERRIDES })
                 });
                 if (!res.ok) { const t = await res.text(); let m=t; try{const j=JSON.parse(t); if(j.reason)m=j.reason;}catch(e){} throw new Error(m); }
                 const j = await res.json();
@@ -199,7 +201,7 @@
             try {
                 const res = await fetch('/moa/roundup/wiki', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ year: YEAR, half: HALF, platform: PLATFORM, spaceKey: spaceKey, decisions: collectDecisions() })
+                    body: JSON.stringify({ year: YEAR, half: HALF, platform: PLATFORM, spaceKey: spaceKey, decisions: collectDecisions(), epicOverrides: OVERRIDES })
                 });
                 if (!res.ok) { const t = await res.text(); let m=t; try{const j=JSON.parse(t); if(j.reason)m=j.reason;}catch(e){} throw new Error(m); }
                 const j = await res.json();
