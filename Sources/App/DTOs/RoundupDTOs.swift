@@ -35,7 +35,7 @@ struct RoundupWikiRequest: Content {
     let half: Int
     let platform: String?
     let spaceKey: String
-    /// rootKey → "planning" | "technical" | "ktlo" | "excluded"
+    /// rootKey → "planning" | "technical" | "ktlo" | "crash" | "excluded"
     let decisions: [String: String]?
     let epicOverrides: String?
 }
@@ -45,7 +45,7 @@ struct RoundupLabelRequest: Content {
     let year: Int
     let half: Int
     let platform: String?
-    /// rootKey → "planning" | "technical" | "ktlo" | "excluded"
+    /// rootKey → "planning" | "technical" | "ktlo" | "crash" | "excluded"
     let decisions: [String: String]?
     let epicOverrides: String?
 }
@@ -65,6 +65,14 @@ struct RoundupTicket: Content {
     let link: String
     let versionLabel: String    // "v3.77.0 - iOS" 등 대표 버전
     let shipDateText: String     // "06/23"
+}
+
+/// 제외된 티켓 + 사유 (왜 제외됐는지 검토용).
+struct RoundupExcluded: Content {
+    let key: String
+    let summary: String
+    let link: String
+    let reason: String       // "상위 에픽 KMA-7393(...) 드랍(CLOSE)" 등
 }
 
 /// 기획/기술 과제 그룹 (root = 최상위 배포 단위).
@@ -93,6 +101,7 @@ struct RoundupContext: Content {
     let ktlo: [RoundupTicket]
     let crash: [RoundupTicket]
     let unversioned: [RoundupTicket]   // 미배포/버전없음 — 검토
+    let excluded: [RoundupExcluded]    // 자동 제외 (상위 드랍 등) — 사유 포함
 
     // 섹션별 카운트 (뷰 헤더용) — 기획/기술은 "과제(그룹) 수"
     let planningCount: Int
@@ -100,4 +109,5 @@ struct RoundupContext: Content {
     let ktloCount: Int
     let crashCount: Int
     let unversionedCount: Int
+    let excludedCount: Int
 }

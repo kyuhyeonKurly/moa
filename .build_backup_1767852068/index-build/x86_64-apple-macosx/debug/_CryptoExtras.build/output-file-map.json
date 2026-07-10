@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_CryptoExtras.build/master.swiftdeps"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-crypto/Sources/_CryptoExtras/Exports.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_CryptoExtras.build/Exports.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_CryptoExtras.build/Exports.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_CryptoExtras.build/Exports~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_CryptoExtras.build/Exports.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_CryptoExtras.build/Exports.dia"
+  }
+}

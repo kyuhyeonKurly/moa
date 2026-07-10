@@ -1,0 +1,40 @@
+{
+  "": {
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/master.swiftdeps"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-distributed-tracing/Sources/Instrumentation/Instrument.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Instrument.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Instrument.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Instrument~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Instrument.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Instrument.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-distributed-tracing/Sources/Instrumentation/InstrumentationSystem.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/InstrumentationSystem.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/InstrumentationSystem.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/InstrumentationSystem~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/InstrumentationSystem.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/InstrumentationSystem.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-distributed-tracing/Sources/Instrumentation/Locks.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Locks.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Locks.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Locks~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Locks.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/Locks.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-distributed-tracing/Sources/Instrumentation/MultiplexInstrument.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/MultiplexInstrument.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/MultiplexInstrument.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/MultiplexInstrument~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/MultiplexInstrument.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/MultiplexInstrument.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-distributed-tracing/Sources/Instrumentation/NoOpInstrument.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/NoOpInstrument.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/NoOpInstrument.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/NoOpInstrument~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/NoOpInstrument.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/Instrumentation.build/NoOpInstrument.dia"
+  }
+}

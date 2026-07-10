@@ -56,6 +56,7 @@
                 <span class="chip">KTLO #(ktloCount)</span>
                 <span class="chip">크래시 #(crashCount)</span>
                 <span class="chip gray">검토 #(unversionedCount)</span>
+                <span class="chip gray">제외 #(excludedCount)</span>
             </div>
         </header>
 
@@ -75,7 +76,8 @@
                 <div class="radios">
                     <label><input type="radio" name="d:#(g.epicKey)" value="planning" #if(g.category == "planning"):checked#endif><span>기획과제</span></label>
                     <label><input type="radio" name="d:#(g.epicKey)" value="technical" #if(g.category == "technical"):checked#endif><span>기술과제</span></label>
-                    <label><input type="radio" name="d:#(g.epicKey)" value="ktlo"><span>KTLO</span></label>
+                    <label><input type="radio" name="d:#(g.epicKey)" value="ktlo" #if(g.category == "ktlo"):checked#endif><span>KTLO</span></label>
+                    <label><input type="radio" name="d:#(g.epicKey)" value="crash" #if(g.category == "crash"):checked#endif><span>크래시</span></label>
                     <label><input type="radio" name="d:#(g.epicKey)" value="excluded"><span>제외</span></label>
                 </div>
                 #endif
@@ -105,7 +107,8 @@
                 <div class="radios">
                     <label><input type="radio" name="d:#(g.epicKey)" value="planning" #if(g.category == "planning"):checked#endif><span>기획과제</span></label>
                     <label><input type="radio" name="d:#(g.epicKey)" value="technical" #if(g.category == "technical"):checked#endif><span>기술과제</span></label>
-                    <label><input type="radio" name="d:#(g.epicKey)" value="ktlo"><span>KTLO</span></label>
+                    <label><input type="radio" name="d:#(g.epicKey)" value="ktlo" #if(g.category == "ktlo"):checked#endif><span>KTLO</span></label>
+                    <label><input type="radio" name="d:#(g.epicKey)" value="crash" #if(g.category == "crash"):checked#endif><span>크래시</span></label>
                     <label><input type="radio" name="d:#(g.epicKey)" value="excluded"><span>제외</span></label>
                 </div>
                 #endif
@@ -149,6 +152,18 @@
             <ul class="tks">
                 #for(t in unversioned):
                 <li><a href="#(t.link)" target="_blank">#(t.key)</a> #(t.summary)</li>
+                #endfor
+            </ul>
+        </section>
+        #endif
+
+        #if(count(excluded) > 0):
+        <section class="bucket">
+            <h2>🚫 자동 제외 <span class="gcount" style="font-weight:400; color:#8a8a8e;">(#(excludedCount))</span></h2>
+            <p class="desc">상위 에픽이 드랍(CLOSE)되는 등으로 성과 집계에서 제외된 티켓. 왜 빠졌는지 사유 확인용.</p>
+            <ul class="tks">
+                #for(e in excluded):
+                <li><a href="#(e.link)" target="_blank">#(e.key)</a> #(e.summary)<span class="v">#(e.reason)</span></li>
                 #endfor
             </ul>
         </section>

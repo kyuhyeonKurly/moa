@@ -1,0 +1,26 @@
+{
+  "": {
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/master.swiftdeps"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-nio/Sources/_NIODataStructures/Heap.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/Heap.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/Heap.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/Heap~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/Heap.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/Heap.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-nio/Sources/_NIODataStructures/PriorityQueue.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/PriorityQueue.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/PriorityQueue.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/PriorityQueue~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/PriorityQueue.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/PriorityQueue.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-nio/Sources/_NIODataStructures/_TinyArray.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/_TinyArray.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/_TinyArray.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/_TinyArray~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/_TinyArray.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/_NIODataStructures.build/_TinyArray.dia"
+  }
+}

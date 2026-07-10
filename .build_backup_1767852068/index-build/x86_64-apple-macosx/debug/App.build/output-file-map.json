@@ -1,0 +1,229 @@
+{
+  "": {
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/master.swiftdeps"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/ConfluenceChildrenCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceChildrenCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceChildrenCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceChildrenCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceChildrenCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceChildrenCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/ConfluenceOrganizeCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceOrganizeCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceOrganizeCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceOrganizeCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceOrganizeCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceOrganizeCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/ConfluenceWikiCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceWikiCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceWikiCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceWikiCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceWikiCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceWikiCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraDomainDetailCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainDetailCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainDetailCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainDetailCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainDetailCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainDetailCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraDomainGuidelineCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainGuidelineCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainGuidelineCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainGuidelineCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainGuidelineCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDomainGuidelineCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraExportCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraExportCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraExportCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraExportCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraExportCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraExportCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraInspectCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraInspectCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraInspectCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraInspectCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraInspectCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraInspectCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraIssueDetailCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueDetailCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueDetailCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueDetailCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueDetailCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueDetailCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraIssueTypeCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueTypeCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueTypeCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueTypeCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueTypeCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraIssueTypeCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraRetrospectiveCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraRetrospectiveCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraRetrospectiveCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraRetrospectiveCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraRetrospectiveCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraRetrospectiveCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraTestCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTestCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTestCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTestCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTestCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTestCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraTicketDetailCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketDetailCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketDetailCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketDetailCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketDetailCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketDetailCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraTicketsCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketsCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketsCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketsCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketsCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTicketsCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraTreeCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTreeCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTreeCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTreeCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTreeCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraTreeCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraVersionDetailCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDetailCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDetailCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDetailCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDetailCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDetailCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Commands/JiraVersionsCommand.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionsCommand.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionsCommand.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionsCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionsCommand.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionsCommand.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Controllers/MoaController.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/MoaController.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/MoaController.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/MoaController~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/MoaController.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/MoaController.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/DTOs/Confluence/ConfluencePageCreateRequest.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageCreateRequest.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageCreateRequest.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageCreateRequest~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageCreateRequest.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageCreateRequest.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/DTOs/Confluence/ConfluencePageResponse.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageResponse.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageResponse.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageResponse~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageResponse.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluencePageResponse.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/DTOs/Confluence/ConfluenceSearchDTOs.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceSearchDTOs.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceSearchDTOs.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceSearchDTOs~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceSearchDTOs.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceSearchDTOs.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/DTOs/JiraDTOs.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDTOs.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDTOs.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDTOs~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDTOs.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraDTOs.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/DTOs/JiraVersionDTOs.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDTOs.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDTOs.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDTOs~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDTOs.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraVersionDTOs.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/DTOs/ReportDTOs.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportDTOs.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportDTOs.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportDTOs~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportDTOs.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportDTOs.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/DTOs/ViewContexts.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ViewContexts.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ViewContexts.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ViewContexts~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ViewContexts.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ViewContexts.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Extensions/Application+Jira.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/Application+Jira.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/Application+Jira.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/Application+Jira~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/Application+Jira.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/Application+Jira.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Services/ConfluenceService.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceService.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceService.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceService~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceService.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ConfluenceService.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Services/JiraAPIClient.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraAPIClient.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraAPIClient.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraAPIClient~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraAPIClient.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraAPIClient.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Services/JiraService.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraService.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraService.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraService~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraService.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/JiraService.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/Services/ReportGenerator.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportGenerator.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportGenerator.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportGenerator~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportGenerator.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/ReportGenerator.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/configure.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/configure.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/configure.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/configure~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/configure.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/configure.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/entrypoint.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/entrypoint.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/entrypoint.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/entrypoint~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/entrypoint.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/entrypoint.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/Sources/App/routes.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/routes.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/routes.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/routes~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/routes.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/App.build/routes.dia"
+  }
+}

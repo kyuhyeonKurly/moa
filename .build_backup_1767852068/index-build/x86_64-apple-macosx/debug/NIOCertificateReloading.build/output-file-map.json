@@ -1,0 +1,19 @@
+{
+  "": {
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/master.swiftdeps"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-nio-extras/Sources/NIOCertificateReloading/CertificateReloader.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/CertificateReloader.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/CertificateReloader.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/CertificateReloader~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/CertificateReloader.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/CertificateReloader.dia"
+  },
+  "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/checkouts/swift-nio-extras/Sources/NIOCertificateReloading/TimedCertificateReloader.swift": {
+    "dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/TimedCertificateReloader.d",
+    "object": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/TimedCertificateReloader.swift.o",
+    "swiftmodule": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/TimedCertificateReloader~partial.swiftmodule",
+    "swift-dependencies": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/TimedCertificateReloader.swiftdeps",
+    "diagnostics": "/Users/g30x74w9xy/Documents/Company/Tool/Projects/moa/.build/index-build/x86_64-apple-macosx/debug/NIOCertificateReloading.build/TimedCertificateReloader.dia"
+  }
+}

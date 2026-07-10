@@ -58,6 +58,7 @@ struct RoundupService {
         var ktlo: [RoundupTicket] = []
         var crash: [RoundupTicket] = []
         var unversioned: [RoundupTicket] = []
+        var excluded: [RoundupExcluded] = []
         var includedCount = 0
         // 기획/기술 과제: rootKey → 누적. root 자신은 헤더라 tickets에서 제외(자기중복 방지).
         struct GroupAcc {
@@ -71,7 +72,17 @@ struct RoundupService {
 
         for leaf in leaves {
             // 최상위 에픽이 CLOSE(드랍)면 하위 DONE 티켓도 제외 (과제 자체가 드랍된 것)
-            if isTopEpicDropped(of: leaf.key, known: known) { continue }
+            // → 그냥 버리지 않고 사유와 함께 excluded로 남겨 "왜 빠졌나" 검토 가능하게.
+            if let topKey = droppedTopEpic(of: leaf.key, known: known) {
+                let topSummary = known[topKey]?.fields.summary ?? topKey
+                excluded.append(RoundupExcluded(
+                    key: leaf.key,
+                    summary: leaf.fields.summary,
+                    link: "\(apiClient.apiBaseURL)/browse/\(leaf.key)",
+                    reason: "상위 에픽 \(topKey)(\(topSummary)) 드랍(CLOSE)"
+                ))
+                continue
+            }
 
             let attribution = attribute(leaf: leaf, known: known, platform: platform,
                                         halfStart: halfStart, halfEndExclusive: halfEndExclusive)
@@ -170,11 +181,13 @@ struct RoundupService {
             ktlo: ktlo.sorted { $0.shipDateText < $1.shipDateText },
             crash: crash.sorted { $0.shipDateText < $1.shipDateText },
             unversioned: unversioned,
+            excluded: excluded.sorted { $0.key < $1.key },
             planningCount: planning.count,
             technicalCount: technical.count,
             ktloCount: ktlo.count,
             crashCount: crash.count,
-            unversionedCount: unversioned.count
+            unversionedCount: unversioned.count,
+            excludedCount: excluded.count
         )
     }
 
@@ -276,9 +289,9 @@ struct RoundupService {
         return cur
     }
 
-    /// leaf의 **최상위 KMA 에픽 status가 CLOSE(드랍)** 인지. (버전 무관 절대 최상위까지 walk)
-    /// 상위 과제가 드랍이면 하위 DONE 티켓도 성과 아님 → 제외.
-    private func isTopEpicDropped(of key: String, known: [String: JiraIssue]) -> Bool {
+    /// leaf의 **최상위 KMA 에픽 status가 CLOSE(드랍)** 이면 그 에픽 key 반환, 아니면 nil.
+    /// (버전 무관 절대 최상위까지 walk) 상위 과제가 드랍이면 하위 DONE 티켓도 성과 아님 → 제외.
+    private func droppedTopEpic(of key: String, known: [String: JiraIssue]) -> String? {
         var cur = key
         var top = key
         var visited = Set<String>()
@@ -288,7 +301,8 @@ struct RoundupService {
             guard let p = known[cur]?.fields.parent?.key, p.hasPrefix("KMA-"), known[p] != nil else { break }
             cur = p
         }
-        return known[top]?.fields.status.name.caseInsensitiveCompare("CLOSE") == .orderedSame
+        let dropped = known[top]?.fields.status.name.caseInsensitiveCompare("CLOSE") == .orderedSame
+        return dropped ? top : nil
     }
 
     /// 지정 에픽(overrides) 중 leaf의 조상 체인에서 **가장 상위** 지정 에픽 + 카테고리 반환.
