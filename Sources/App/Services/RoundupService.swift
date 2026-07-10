@@ -42,10 +42,10 @@ struct RoundupService {
         let leaves = try await searchAll(jql: jql)
         logger.info("[Roundup] fetched \(leaves.count) leaf issues")
 
-        // parent-child 이중집계 dedup 집합: 부모가 이미 내 수집 leaf면 그 자식은 성과 단위 아님
-        // (부모 스토리가 대표). DONE 스토리(예: KMA-7711)는 수집됨 → 검증 하위작업 흡수.
-        // 진행중 컨테이너(크래시 분기 스토리 KMA-8175 등)는 미수집 → 그 하위 크래시 fix는 유지.
-        let leafKeys = Set(leaves.map { $0.key })
+        // 사용자 지정 제외 키 — "분류 지정 에픽" 입력의 `제외: KMA-키...` 줄로 특정 티켓만 뺀다.
+        // (구조적 자동 dedup은 별개 성과인 하위작업까지 흡수해 위험 → 사람이 명시 지정)
+        // 예: KMA-7711 검증 하위 7712/7726/7727/7743 (개별 성과 아닌 검증 단계).
+        let excludeKeys = RoundupClassifier.parseExcludeKeys(request.epicOverrides)
 
         // 2) 조상 에픽 해석 (라벨 포함), 최대 4홉
         var known: [String: JiraIssue] = [:]
@@ -78,9 +78,16 @@ struct RoundupService {
         var groups: [String: GroupAcc] = [:]
 
         for leaf in leaves {
-            // 부모가 이미 내 수집 티켓(DONE)이면 skip — 부모가 대표(parent-child 이중집계 해소).
-            // 크래시처럼 부모가 진행중 컨테이너(미수집)면 통과 → 하위 fix가 성과 단위로 유지.
-            if let p = leaf.fields.parent?.key, leafKeys.contains(p) { continue }
+            // 사용자가 명시 지정한 제외 키면 사유와 함께 제외 (검증 하위작업 등 개별성과 아닌 것)
+            if excludeKeys.contains(leaf.key) {
+                excluded.append(RoundupExcluded(
+                    key: leaf.key,
+                    summary: leaf.fields.summary,
+                    link: "\(apiClient.apiBaseURL)/browse/\(leaf.key)",
+                    reason: "사용자 지정 제외 (검증 하위작업 등)"
+                ))
+                continue
+            }
 
             // 최상위 에픽이 CLOSE(드랍)면 하위 DONE 티켓도 제외 (과제 자체가 드랍된 것)
             // → 그냥 버리지 않고 사유와 함께 excluded로 남겨 "왜 빠졌나" 검토 가능하게.

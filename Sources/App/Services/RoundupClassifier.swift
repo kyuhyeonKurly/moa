@@ -67,6 +67,8 @@ enum RoundupClassifier {
         for rawLine in text.split(whereSeparator: { $0 == "\n" || $0 == "\r" }) {
             let line = String(rawLine)
             let lower = line.lowercased()
+            // 제외 줄은 override 대상 아님 (parseExcludeKeys가 별도 처리) → 건너뜀
+            if line.contains("제외") || lower.contains("exclude") { continue }
             let cat: String
             if line.contains("기획") || lower.contains("planning") { cat = "planning" }
             else if lower.contains("ktlo") { cat = "ktlo" }
@@ -75,6 +77,20 @@ enum RoundupClassifier {
             for key in extractIssueKeys(line) { map[key] = cat }
         }
         return map
+    }
+
+    /// "제외: KMA-키, ..." 줄에서 제외할 티켓 키 집합 추출.
+    /// 개별 성과가 아닌 검증/분해 하위작업을 사람이 명시 제외할 때 사용
+    /// (구조적 자동 dedup은 별개 성과 하위작업까지 흡수해 위험하므로 사람 지정 방식).
+    static func parseExcludeKeys(_ text: String?) -> Set<String> {
+        guard let text = text, !text.isEmpty else { return [] }
+        var keys: Set<String> = []
+        for rawLine in text.split(whereSeparator: { $0 == "\n" || $0 == "\r" }) {
+            let line = String(rawLine)
+            guard line.contains("제외") || line.lowercased().contains("exclude") else { continue }
+            for key in extractIssueKeys(line) { keys.insert(key) }
+        }
+        return keys
     }
 
     /// 문자열에서 이슈키(PROJ-123) 추출 (Jira 링크 안의 키도 잡힘).

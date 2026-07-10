@@ -91,11 +91,13 @@
             </div>
 
             <div class="form-group" id="overrides-group" style="display:none;">
-                <label for="epicOverrides">분류 지정 에픽 (선택)</label>
-                <textarea id="epicOverrides" name="epicOverrides" rows="3" style="width:100%; padding:0.8rem; border:1px solid #d2d2d7; border-radius:8px; font-size:0.9rem; box-sizing:border-box; font-family:inherit;">기술: KMA-8172, KMA-8594, KMA-8265, KMA-6393, KMA-8266</textarea>
+                <label for="epicOverrides">분류 지정 에픽 / 제외 (선택)</label>
+                <textarea id="epicOverrides" name="epicOverrides" rows="4" style="width:100%; padding:0.8rem; border:1px solid #d2d2d7; border-radius:8px; font-size:0.9rem; box-sizing:border-box; font-family:inherit;">기술: KMA-8172, KMA-8594, KMA-8265, KMA-6393, KMA-8266
+제외: KMA-7712, KMA-7726, KMA-7727, KMA-7743</textarea>
                 <div class="help-text">
-                    <p style="margin:0.2rem 0;"><strong>공통 기술과제</strong>(여러 담당자가 하위에 붙이는 팀 상위 에픽) 지정 — 하위 티켓이 이 에픽으로 묶여 자동 분류(버전 분리 안 함).</p>
-                    <p style="margin:0.2rem 0;">형식: <code>카테고리: KMA-키, KMA-키</code> (줄 단위 · 링크도 OK). 카테고리 = 기획/기술/KTLO.</p>
+                    <p style="margin:0.2rem 0;"><strong>공통 기술과제</strong>(팀 상위 에픽) 지정 — 하위가 이 에픽으로 묶여 자동 분류(버전 분리 안 함).</p>
+                    <p style="margin:0.2rem 0;"><strong>제외</strong> = 개별 성과가 아닌 검증/분해 하위작업 빼기 (예: 7711의 [문제N 검증] 하위 4개).</p>
+                    <p style="margin:0.2rem 0;">형식: <code>카테고리: KMA-키, ...</code> 줄 단위 · 링크 OK. 카테고리 = 기획/기술/KTLO/<strong>제외</strong>.</p>
                 </div>
             </div>
 
