@@ -70,6 +70,9 @@ struct RoundupService {
         var groups: [String: GroupAcc] = [:]
 
         for leaf in leaves {
+            // 최상위 에픽이 CLOSE(드랍)면 하위 DONE 티켓도 제외 (과제 자체가 드랍된 것)
+            if isTopEpicDropped(of: leaf.key, known: known) { continue }
+
             let attribution = attribute(leaf: leaf, known: known, platform: platform,
                                         halfStart: halfStart, halfEndExclusive: halfEndExclusive)
             switch attribution {
@@ -271,6 +274,21 @@ struct RoundupService {
             cur = p
         }
         return cur
+    }
+
+    /// leaf의 **최상위 KMA 에픽 status가 CLOSE(드랍)** 인지. (버전 무관 절대 최상위까지 walk)
+    /// 상위 과제가 드랍이면 하위 DONE 티켓도 성과 아님 → 제외.
+    private func isTopEpicDropped(of key: String, known: [String: JiraIssue]) -> Bool {
+        var cur = key
+        var top = key
+        var visited = Set<String>()
+        while known[cur] != nil, !visited.contains(cur) {
+            top = cur
+            visited.insert(cur)
+            guard let p = known[cur]?.fields.parent?.key, p.hasPrefix("KMA-"), known[p] != nil else { break }
+            cur = p
+        }
+        return known[top]?.fields.status.name.caseInsensitiveCompare("CLOSE") == .orderedSame
     }
 
     /// 지정 에픽(overrides) 중 leaf의 조상 체인에서 **가장 상위** 지정 에픽 + 카테고리 반환.
