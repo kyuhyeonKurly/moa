@@ -27,8 +27,9 @@ struct RoundupService {
         let (winStart, winEnd) = Self.collectionWindow(year: request.year, half: request.half)
         let assigneeClause = (request.assignee?.isEmpty == false)
             ? "assignee = \"\(request.assignee!)\"" : "assignee = currentUser()"
+        // status "CLOSE"(취소/드랍)는 제외 — 완료(DONE)만 집계. (둘 다 statusCategory=done(green))
         let jql = """
-        \(assigneeClause) AND project = KMA AND statusCategory = Done \
+        \(assigneeClause) AND project = KMA AND statusCategory = Done AND status != "CLOSE" \
         AND resolutiondate >= "\(winStart)" AND resolutiondate <= "\(winEnd)" \
         ORDER BY resolutiondate ASC
         """
@@ -238,6 +239,8 @@ struct RoundupService {
         var cur = key
         var visited = Set<String>()
         while let p = known[cur]?.fields.parent?.key, !visited.contains(cur), let parent = known[p] {
+            // 타 프로젝트(예: KQA=SQE 보드) 부모로는 넘어가지 않는다 — 우리 과제 아님
+            if !p.hasPrefix("KMA-") { break }
             if let sv = shipVer, let pOwn = ownVersionKey(parent), pOwn != sv {
                 break // 부모는 다른 버전으로 배포됨 → cur가 이 배포의 최상위
             }

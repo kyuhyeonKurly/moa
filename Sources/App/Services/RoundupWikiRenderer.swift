@@ -10,13 +10,15 @@ enum RoundupWikiRenderer {
              .replacingOccurrences(of: "<", with: "&lt;")
              .replacingOccurrences(of: ">", with: "&gt;")
         }
-        // 라벨된(locked) 건 확정 → decisions 무시. 무라벨만 사람 결정(decisions) 반영, "excluded"는 제외.
+        // 라벨된(locked) 건 확정 → decisions 무시. 무라벨만 사람 결정(decisions) 반영.
+        // "excluded" → 제외, "ktlo" → KTLO 섹션으로 수동 그룹핑(라벨 write-back 없음).
         func finalCategory(_ g: RoundupEpicGroup) -> String {
             g.locked ? g.category : (decisions[g.epicKey] ?? g.category)
         }
         let allGroups = context.planning + context.technical
         let planning = allGroups.filter { finalCategory($0) == "planning" }
         let technical = allGroups.filter { finalCategory($0) == "technical" }
+        let ktloGroups = allGroups.filter { finalCategory($0) == "ktlo" }
 
         func epicSection(_ title: String, _ groups: [RoundupEpicGroup]) -> String {
             var s = "<h2>\(title) (\(groups.count)건)</h2>"
@@ -49,7 +51,26 @@ enum RoundupWikiRenderer {
         html += "<p><em>※ 귀속 기준: fixVersion 실제 배포일(GitHub Releases). 버전 없는 인프라/백엔드 작업은 완료일 기준. 분류는 최상위 과제의 기획과제/기술과제/KTLO 라벨 기준(자동), 무라벨은 사람이 확정.</em></p>"
         html += epicSection("🎯 기획과제", planning)
         html += epicSection("🛠 기술과제", technical)
-        html += flatSection("🔧 KTLO", context.ktlo)
+        // KTLO: 라벨 KTLO 에픽 하위(auto) + 사람이 KTLO로 수동 지정한 과제(그룹)
+        var ktloHtml = "<h2>🔧 KTLO</h2>"
+        if context.ktlo.isEmpty && ktloGroups.isEmpty {
+            ktloHtml += "<p>-</p>"
+        } else {
+            ktloHtml += "<ul>"
+            for t in context.ktlo { ktloHtml += "<li><a href=\"\(t.link)\">\(t.key)</a> \(esc(t.summary))</li>" }
+            ktloHtml += "</ul>"
+            for g in ktloGroups {
+                let link = g.epicLink ?? "https://kurly0521.atlassian.net/browse/\(g.epicKey)"
+                let sub = g.ticketCount > 0 ? " (하위 \(g.ticketCount))" : ""
+                ktloHtml += "<p>📌 <a href=\"\(link)\">\(g.epicKey)</a> <strong>\(esc(g.epicSummary))</strong>\(sub)</p>"
+                if !g.tickets.isEmpty {
+                    ktloHtml += "<ul>"
+                    for t in g.tickets { ktloHtml += "<li><a href=\"\(t.link)\">\(t.key)</a> \(esc(t.summary))</li>" }
+                    ktloHtml += "</ul>"
+                }
+            }
+        }
+        html += ktloHtml
         html += flatSection("💥 크래시 대응", context.crash)
         if !context.unversioned.isEmpty {
             html += flatSection("❓ 검토 필요 (미배포/버전없음)", context.unversioned)

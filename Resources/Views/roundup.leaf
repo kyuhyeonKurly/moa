@@ -75,6 +75,7 @@
                 <div class="radios">
                     <label><input type="radio" name="d:#(g.epicKey)" value="planning" #if(g.category == "planning"):checked#endif><span>기획과제</span></label>
                     <label><input type="radio" name="d:#(g.epicKey)" value="technical" #if(g.category == "technical"):checked#endif><span>기술과제</span></label>
+                    <label><input type="radio" name="d:#(g.epicKey)" value="ktlo"><span>KTLO</span></label>
                     <label><input type="radio" name="d:#(g.epicKey)" value="excluded"><span>제외</span></label>
                 </div>
                 #endif
@@ -104,6 +105,7 @@
                 <div class="radios">
                     <label><input type="radio" name="d:#(g.epicKey)" value="planning" #if(g.category == "planning"):checked#endif><span>기획과제</span></label>
                     <label><input type="radio" name="d:#(g.epicKey)" value="technical" #if(g.category == "technical"):checked#endif><span>기술과제</span></label>
+                    <label><input type="radio" name="d:#(g.epicKey)" value="ktlo"><span>KTLO</span></label>
                     <label><input type="radio" name="d:#(g.epicKey)" value="excluded"><span>제외</span></label>
                 </div>
                 #endif
