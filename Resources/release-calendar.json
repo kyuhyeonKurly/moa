@@ -1,0 +1,2021 @@
+{
+  "source": "github.com/thefarmersfront",
+  "releases": [
+    {
+      "platform": "iOS",
+      "version": "2.16.0",
+      "tag": "v2.16.0",
+      "name": "v2.16.0",
+      "releasedAt": "2019-08-23T02:25:36Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.16.3",
+      "tag": "v2.16.3",
+      "name": "v2.16.3",
+      "releasedAt": "2019-09-06T07:47:50Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.17.0",
+      "tag": "v2.17.0",
+      "name": "v2.17.0",
+      "releasedAt": "2019-09-20T02:44:12Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.18.1",
+      "tag": "v2.18.1",
+      "name": "v2.18.1",
+      "releasedAt": "2019-11-13T02:11:08Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.19.0",
+      "tag": "v2.19.0",
+      "name": "v2.19.0",
+      "releasedAt": "2019-11-26T06:56:35Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.19.1",
+      "tag": "v2.19.1",
+      "name": "v2.19.1",
+      "releasedAt": "2019-12-10T07:27:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.19.2",
+      "tag": "v2.19.2",
+      "name": "v2.19.2",
+      "releasedAt": "2020-02-17T07:19:46Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.19.4",
+      "tag": "v2.19.4",
+      "name": "v2.19.4",
+      "releasedAt": "2020-03-26T06:10:59Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.19.5",
+      "tag": "v2.19.5",
+      "name": "v2.19.5",
+      "releasedAt": "2020-03-26T06:11:36Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.19.6",
+      "tag": "v2.19.6",
+      "name": "v2.19.6",
+      "releasedAt": "2020-04-23T08:21:25Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.20.0",
+      "tag": "v2.20.0",
+      "name": "v.2.20.0",
+      "releasedAt": "2020-06-03T06:48:38Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.21.0",
+      "tag": "v2.21.0",
+      "name": "v2.21.0",
+      "releasedAt": "2020-06-24T23:53:19Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.22.0",
+      "tag": "v2.22.0",
+      "name": "v2.22.0",
+      "releasedAt": "2020-09-01T07:59:02Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.23.0",
+      "tag": "v2.23.0",
+      "name": "v2.23.0",
+      "releasedAt": "2020-11-09T00:22:53Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.23.1",
+      "tag": "v2.23.1",
+      "name": "v2.23.1",
+      "releasedAt": "2020-11-09T00:23:24Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.24.0",
+      "tag": "v2.24.0",
+      "name": "v2.24.0",
+      "releasedAt": "2021-05-25T23:57:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.24.1",
+      "tag": "v2.24.1",
+      "name": "v2.24.1",
+      "releasedAt": "2021-05-25T23:57:35Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.27.0",
+      "tag": "v2.27.0",
+      "name": "v2.27.0",
+      "releasedAt": "2021-05-25T23:58:54Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.28.0",
+      "tag": "v2.28.0",
+      "name": "v2.28.0",
+      "releasedAt": "2021-05-25T23:59:55Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.29.0",
+      "tag": "v2.29.0",
+      "name": "v2.29.0",
+      "releasedAt": "2021-05-26T00:01:15Z"
+    },
+    {
+      "platform": "Android",
+      "version": "2.31.1",
+      "tag": "v2.31.1",
+      "name": "6월 배포 핫픽스",
+      "releasedAt": "2021-06-24T01:53:06Z"
+    },
+    {
+      "platform": "Android",
+      "version": "2.32.0",
+      "tag": "v2.32.0",
+      "name": "7월 7일 배포",
+      "releasedAt": "2021-07-07T01:55:17Z"
+    },
+    {
+      "platform": "Android",
+      "version": "2.34.0",
+      "tag": "v2.34.0",
+      "name": "9월 1일 배포",
+      "releasedAt": "2021-09-02T01:20:57Z"
+    },
+    {
+      "platform": "Android",
+      "version": "2.35.3",
+      "tag": "v2.35.3",
+      "name": "11월 20일 배포",
+      "releasedAt": "2021-11-22T00:36:25Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.30.0",
+      "tag": "v2.30.0",
+      "name": "v2.30.0",
+      "releasedAt": "2021-12-07T08:50:08Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.31.0",
+      "tag": "v2.31.0",
+      "name": "v2.31.0",
+      "releasedAt": "2021-12-07T08:51:38Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.31.1",
+      "tag": "v2.31.1",
+      "name": "v2.31.1",
+      "releasedAt": "2021-12-07T08:52:50Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.32.0",
+      "tag": "v2.32.0",
+      "name": "v2.32.0",
+      "releasedAt": "2021-12-07T08:54:18Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.33.0",
+      "tag": "v2.33.0",
+      "name": "v2.33.0",
+      "releasedAt": "2021-12-07T08:55:07Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.34.0",
+      "tag": "v2.34.0",
+      "name": "v2.34.0",
+      "releasedAt": "2021-12-07T08:56:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.34.1",
+      "tag": "v2.34.1",
+      "name": "v2.34.1",
+      "releasedAt": "2021-12-07T08:57:10Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.35.0",
+      "tag": "v2.35.0",
+      "name": "v2.35.0",
+      "releasedAt": "2021-12-07T08:57:56Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.35.1",
+      "tag": "v2.35.1",
+      "name": "v2.35.1",
+      "releasedAt": "2021-12-07T08:58:51Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.35.2",
+      "tag": "v2.35.2",
+      "name": "v2.35.2",
+      "releasedAt": "2021-12-07T08:59:33Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.35.3",
+      "tag": "v2.35.3",
+      "name": "v2.35.3",
+      "releasedAt": "2021-12-07T09:00:17Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.36.0",
+      "tag": "v2.36.0",
+      "name": "v2.36.0",
+      "releasedAt": "2021-12-07T09:04:31Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.36.1",
+      "tag": "v2.36.1",
+      "name": "v2.36.1",
+      "releasedAt": "2021-12-07T09:05:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.36.2",
+      "tag": "v2.36.2",
+      "name": "v2.36.2",
+      "releasedAt": "2021-12-13T08:17:58Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.37.0",
+      "tag": "v2.37.0",
+      "name": "v2.37.0",
+      "releasedAt": "2022-01-12T04:33:20Z"
+    },
+    {
+      "platform": "Android",
+      "version": "2.37.2",
+      "tag": "v2.37.2",
+      "name": "1월 13일 배포",
+      "releasedAt": "2022-01-12T09:54:11Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.38.0",
+      "tag": "v2.38.0",
+      "name": "v2.38.0",
+      "releasedAt": "2022-02-08T05:19:38Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.38.1",
+      "tag": "v2.38.1",
+      "name": "v2.38.1",
+      "releasedAt": "2022-03-25T06:20:52Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.39.0",
+      "tag": "v2.39.0",
+      "name": "v2.39.0",
+      "releasedAt": "2022-04-22T01:58:52Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.39.1",
+      "tag": "v2.39.1",
+      "name": "v2.39.1",
+      "releasedAt": "2022-05-16T04:47:56Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.39.2",
+      "tag": "v2.39.2",
+      "name": "v2.39.2",
+      "releasedAt": "2022-08-01T00:56:45Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.40.0",
+      "tag": "v2.40.0",
+      "name": "v2.40.0",
+      "releasedAt": "2022-08-01T00:58:48Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.40.1",
+      "tag": "v2.40.1",
+      "name": "v2.40.1",
+      "releasedAt": "2022-08-01T01:01:40Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.41.0",
+      "tag": "v2.41.0",
+      "name": "v2.41.0",
+      "releasedAt": "2022-08-01T01:18:45Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.41.1",
+      "tag": "v2.41.1",
+      "name": "v2.41.1",
+      "releasedAt": "2022-08-01T01:25:27Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "2.41.2",
+      "tag": "v2.41.2",
+      "name": "v2.41.2",
+      "releasedAt": "2022-08-01T01:33:04Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.0.1",
+      "tag": "v3.0.1",
+      "name": "v3.0.1",
+      "releasedAt": "2022-08-01T01:36:34Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.0.3",
+      "tag": "v3.0.3",
+      "name": "v3.0.3",
+      "releasedAt": "2022-08-19T06:24:47Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.1.0",
+      "tag": "v3.1.0",
+      "name": "v3.1.0",
+      "releasedAt": "2022-08-25T02:30:25Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.1.1",
+      "tag": "v3.1.1",
+      "name": "v3.1.1",
+      "releasedAt": "2022-08-29T04:14:25Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.2.0",
+      "tag": "v3.2.0",
+      "name": "v3.2.0",
+      "releasedAt": "2022-09-02T02:47:52Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.2.1",
+      "tag": "v3.2.1",
+      "name": "v3.2.1",
+      "releasedAt": "2022-09-07T06:12:13Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.3.0",
+      "tag": "v3.3.0",
+      "name": "v3.3.0",
+      "releasedAt": "2022-10-04T02:32:37Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.3.2",
+      "tag": "v3.3.2",
+      "name": "",
+      "releasedAt": "2022-10-21T01:30:57Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.4.0",
+      "tag": "v3.4.0",
+      "name": "v3.4.0",
+      "releasedAt": "2022-11-09T02:32:07Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.4.1",
+      "tag": "v3.4.1",
+      "name": "v3.4.1",
+      "releasedAt": "2022-11-09T02:33:38Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.5.0",
+      "tag": "v3.5.0",
+      "name": "v3.5.0",
+      "releasedAt": "2022-11-14T01:23:57Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.5.2",
+      "tag": "v3.5.2",
+      "name": "v3.5.2",
+      "releasedAt": "2022-11-16T02:21:53Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.8.0",
+      "tag": "v3.8.0",
+      "name": "v3.8.0",
+      "releasedAt": "2022-11-22T04:57:14Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.6.2",
+      "tag": "v3.6.2",
+      "name": "v3.6.2",
+      "releasedAt": "2022-12-06T04:31:26Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.6.3",
+      "tag": "v3.6.3",
+      "name": "v3.6.3",
+      "releasedAt": "2022-12-08T08:55:13Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.8.1",
+      "tag": "v3.8.1",
+      "name": "v3.8.1",
+      "releasedAt": "2023-01-19T04:12:33Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.9.0",
+      "tag": "v3.9.0",
+      "name": "v3.9.0 ",
+      "releasedAt": "2023-02-06T03:56:16Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.10.0",
+      "tag": "v3.10.0",
+      "name": "v3.10.0",
+      "releasedAt": "2023-03-02T01:30:27Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.10.1",
+      "tag": "v3.10.1",
+      "name": "v3.10.1",
+      "releasedAt": "2023-03-03T05:46:07Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.10.2",
+      "tag": "v3.10.2",
+      "name": "v3.10.2",
+      "releasedAt": "2023-03-06T04:37:11Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.10.3",
+      "tag": "v3.10.3",
+      "name": "v3.10.3",
+      "releasedAt": "2023-03-08T01:03:52Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.10.4",
+      "tag": "v3.10.4",
+      "name": "v3.10.4",
+      "releasedAt": "2023-03-09T04:43:38Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.10.5",
+      "tag": "v3.10.5",
+      "name": "v3.10.5",
+      "releasedAt": "2023-03-17T01:13:22Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.11.0",
+      "tag": "v3.11.0",
+      "name": "v3.11.0",
+      "releasedAt": "2023-04-05T09:33:02Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.11.1",
+      "tag": "v3.11.1",
+      "name": "v3.11.1",
+      "releasedAt": "2023-04-10T06:29:19Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.13.0",
+      "tag": "v3.13.0",
+      "name": "v3.13.0",
+      "releasedAt": "2023-05-18T04:25:35Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.14.0",
+      "tag": "v3.14.0",
+      "name": "v3.14.0",
+      "releasedAt": "2023-06-08T07:26:45Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.14.1",
+      "tag": "v3.14.1",
+      "name": "v3.14.1",
+      "releasedAt": "2023-06-26T00:44:01Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.15.0",
+      "tag": "v3.15.0",
+      "name": "v3.15.0",
+      "releasedAt": "2023-07-06T06:10:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.15.1",
+      "tag": "v3.15.1",
+      "name": "v3.15.1",
+      "releasedAt": "2023-07-06T06:11:21Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.16.0",
+      "tag": "v3.16.0",
+      "name": "v3.16.0",
+      "releasedAt": "2023-07-25T11:55:19Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.16.1",
+      "tag": "v3.16.1",
+      "name": "v3.16.1",
+      "releasedAt": "2023-08-01T03:14:45Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.16.3",
+      "tag": "v3.16.3",
+      "name": "v3.16.3",
+      "releasedAt": "2023-08-09T02:42:08Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.16.4",
+      "tag": "v3.16.4",
+      "name": "v3.16.4",
+      "releasedAt": "2023-08-09T02:43:08Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.17.2",
+      "tag": "v3.17.2",
+      "name": "v3.17.2",
+      "releasedAt": "2023-08-25T04:23:37Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.17.4",
+      "tag": "v3.17.4",
+      "name": "v3.17.4",
+      "releasedAt": "2023-09-01T02:03:56Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.17.5",
+      "tag": "v3.17.5",
+      "name": "v3.17.5",
+      "releasedAt": "2023-09-11T01:16:15Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.19.0",
+      "tag": "v3.19.0",
+      "name": "v3.19.0",
+      "releasedAt": "2023-10-17T06:04:40Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.18.0",
+      "tag": "v3.18.0",
+      "name": "v3.18.0",
+      "releasedAt": "2023-10-17T06:06:54Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.19.1",
+      "tag": "v3.19.1",
+      "name": "v3.19.1",
+      "releasedAt": "2023-10-30T01:28:21Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.20.0",
+      "tag": "v3.20.0",
+      "name": "v3.20.0",
+      "releasedAt": "2023-11-07T01:41:56Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.20.1",
+      "tag": "v3.20.1",
+      "name": "v3.20.1",
+      "releasedAt": "2023-11-16T01:16:59Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.21.0",
+      "tag": "v3.21.0",
+      "name": "v3.21.0",
+      "releasedAt": "2023-12-14T02:47:32Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.22.0",
+      "tag": "v3.22.0",
+      "name": "v3.22.0",
+      "releasedAt": "2023-12-15T08:38:02Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.22.1",
+      "tag": "v3.22.1",
+      "name": "v3.22.1",
+      "releasedAt": "2023-12-21T09:24:08Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.23.0",
+      "tag": "v3.23.0",
+      "name": "v3.23.0",
+      "releasedAt": "2024-01-02T03:39:44Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.23.1",
+      "tag": "v3.23.1",
+      "name": "v3.23.1",
+      "releasedAt": "2024-01-04T02:36:40Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.24.0",
+      "tag": "v3.24.0",
+      "name": "v3.24.0",
+      "releasedAt": "2024-01-15T06:25:20Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.24.1",
+      "tag": "v3.24.1",
+      "name": "v3.24.1",
+      "releasedAt": "2024-01-25T10:24:51Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.24.2",
+      "tag": "v3.24.2",
+      "name": "v3.24.2",
+      "releasedAt": "2024-01-31T02:43:46Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.24.3",
+      "tag": "v3.24.3",
+      "name": "v3.24.3",
+      "releasedAt": "2024-01-31T10:13:41Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.25.0",
+      "tag": "v3.25.0",
+      "name": "v.3.25.0",
+      "releasedAt": "2024-02-13T08:25:21Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.25.1",
+      "tag": "v3.25.1",
+      "name": "v3.25.1",
+      "releasedAt": "2024-02-16T01:03:00Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.26.0",
+      "tag": "v3.26.0",
+      "name": "v3.26.0",
+      "releasedAt": "2024-03-05T02:04:58Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.26.1",
+      "tag": "v3.26.1",
+      "name": "v3.26.1",
+      "releasedAt": "2024-03-05T09:06:43Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.27.0",
+      "tag": "v3.27.0",
+      "name": "v3.27.0",
+      "releasedAt": "2024-03-28T01:57:59Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.28.0",
+      "tag": "v3.28.0",
+      "name": "v3.28.0",
+      "releasedAt": "2024-04-23T02:28:13Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.28.2",
+      "tag": "v3.28.2",
+      "name": "v3.28.2",
+      "releasedAt": "2024-05-08T09:42:22Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.29.0",
+      "tag": "v3.29.0",
+      "name": "v3.29.0",
+      "releasedAt": "2024-05-17T01:43:58Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.29.1",
+      "tag": "v3.29.1",
+      "name": "v3.29.1",
+      "releasedAt": "2024-05-17T09:27:40Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.29.2",
+      "tag": "v3.29.2",
+      "name": "v3.29.2",
+      "releasedAt": "2024-05-29T00:00:23Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.29.3",
+      "tag": "v3.29.3",
+      "name": "v3.29.3",
+      "releasedAt": "2024-06-03T04:13:46Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.30.1",
+      "tag": "v3.30.1",
+      "name": "v3.30.1",
+      "releasedAt": "2024-06-23T23:19:18Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.30.2",
+      "tag": "v3.30.2",
+      "name": "v3.30.2",
+      "releasedAt": "2024-06-26T01:06:11Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.30.3",
+      "tag": "v3.30.3",
+      "name": "v3.30.3",
+      "releasedAt": "2024-07-03T07:48:59Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.31.0",
+      "tag": "v3.31.0",
+      "name": "v3.31.0",
+      "releasedAt": "2024-07-16T04:22:22Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.31.1",
+      "tag": "v3.31.1",
+      "name": "v3.31.1",
+      "releasedAt": "2024-07-19T02:11:55Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.31.2",
+      "tag": "v3.31.2",
+      "name": "v3.31.2",
+      "releasedAt": "2024-07-22T23:39:08Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.32.0",
+      "tag": "v3.32.0",
+      "name": "v3.32.0",
+      "releasedAt": "2024-08-13T00:32:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.32.1",
+      "tag": "v3.32.1",
+      "name": "v3.32.1",
+      "releasedAt": "2024-08-20T00:59:04Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.33.0",
+      "tag": "v3.33.0",
+      "name": "v3.33.0",
+      "releasedAt": "2024-09-02T06:58:09Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.33.1",
+      "tag": "v3.33.1",
+      "name": "v3.33.1",
+      "releasedAt": "2024-09-09T01:26:35Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.33.2",
+      "tag": "v3.33.2",
+      "name": "v3.33.2",
+      "releasedAt": "2024-09-11T09:46:36Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.33.3",
+      "tag": "v3.33.3",
+      "name": "v3.33.3",
+      "releasedAt": "2024-09-25T01:28:04Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.34.0",
+      "tag": "v3.34.0",
+      "name": "v3.34.0",
+      "releasedAt": "2024-10-21T01:22:15Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.34.1",
+      "tag": "v3.34.1",
+      "name": "v3.34.1",
+      "releasedAt": "2024-11-04T00:36:04Z"
+    },
+    {
+      "platform": "iOS",
+      "version": ".3.34.2",
+      "tag": "v.3.34.2",
+      "name": "v3.34.2",
+      "releasedAt": "2024-11-04T00:37:13Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.35.0",
+      "tag": "v3.35.0",
+      "name": "v3.35.0",
+      "releasedAt": "2024-11-21T06:26:25Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.36.0",
+      "tag": "v3.36.0",
+      "name": "v3.36.0",
+      "releasedAt": "2024-11-26T00:21:57Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.36.1",
+      "tag": "v3.36.1",
+      "name": "v3.36.1",
+      "releasedAt": "2024-11-27T08:30:53Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.36.2",
+      "tag": "v3.36.2",
+      "name": "v3.36.2",
+      "releasedAt": "2024-12-02T02:03:27Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.37.0",
+      "tag": "v3.37.0",
+      "name": "v3.37.0",
+      "releasedAt": "2024-12-10T01:49:21Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.37.1",
+      "tag": "v3.37.1",
+      "name": "v3.37.1",
+      "releasedAt": "2024-12-12T02:03:11Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.37.2",
+      "tag": "v3.37.2",
+      "name": "v3.37.2",
+      "releasedAt": "2024-12-17T00:21:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.38.0",
+      "tag": "v3.38.0",
+      "name": "v3.38.0",
+      "releasedAt": "2025-01-02T01:04:30Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.38.1",
+      "tag": "v3.38.1",
+      "name": "v3.38.1",
+      "releasedAt": "2025-01-02T01:06:09Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.38.2",
+      "tag": "v3.38.2",
+      "name": "v3.38.2",
+      "releasedAt": "2025-01-06T01:39:58Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.39.0",
+      "tag": "3.39.0",
+      "name": "v3.39.0",
+      "releasedAt": "2025-01-14T01:31:13Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.39.1",
+      "tag": "v3.39.1",
+      "name": "v3.39.1",
+      "releasedAt": "2025-01-17T02:34:13Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.40.0",
+      "tag": "v3.40.0",
+      "name": "v3.40.0",
+      "releasedAt": "2025-01-31T01:30:19Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.41.0",
+      "tag": "v3.41.0",
+      "name": "v3.41.0",
+      "releasedAt": "2025-02-18T00:35:26Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.42.0",
+      "tag": "v3.42.0",
+      "name": "v3.42.0",
+      "releasedAt": "2025-02-20T05:52:44Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.42.1",
+      "tag": "v3.42.1",
+      "name": "v3.42.1",
+      "releasedAt": "2025-02-24T01:55:42Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.42.2",
+      "tag": "v3.42.2",
+      "name": "v3.42.2",
+      "releasedAt": "2025-02-27T06:03:47Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.42.3",
+      "tag": "v3.42.3",
+      "name": "v3.42.3",
+      "releasedAt": "2025-03-08T03:20:46Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.44.0",
+      "tag": "v3.44.0",
+      "name": "v3.44.0",
+      "releasedAt": "2025-03-11T07:52:58Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.44.5",
+      "tag": "v3.44.5",
+      "name": "v3.44.5",
+      "releasedAt": "2025-03-24T02:20:55Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.44.6",
+      "tag": "v3.44.6",
+      "name": "v3.44.6",
+      "releasedAt": "2025-03-24T02:21:51Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.45.0",
+      "tag": "v3.45.0",
+      "name": "v3.45.0",
+      "releasedAt": "2025-03-28T01:13:58Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.46.0",
+      "tag": "v3.46.0",
+      "name": "v3.46.0",
+      "releasedAt": "2025-03-28T01:15:49Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.46.1",
+      "tag": "v3.46.1",
+      "name": "v3.46.1",
+      "releasedAt": "2025-03-31T01:21:39Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.47.0",
+      "tag": "v3.47.0",
+      "name": "v3.47.0",
+      "releasedAt": "2025-04-02T11:03:46Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.48.0",
+      "tag": "v3.48.0",
+      "name": "v3.48.0",
+      "releasedAt": "2025-04-04T08:11:47Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.49.0",
+      "tag": "v3.49.0",
+      "name": "v3.49.0",
+      "releasedAt": "2025-04-15T00:52:01Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.49.0",
+      "tag": "3.49.0",
+      "name": "3.49.0",
+      "releasedAt": "2025-04-18T10:00:36Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.50.0",
+      "tag": "v3.50.0",
+      "name": "v3.50.0",
+      "releasedAt": "2025-04-22T07:15:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.51.0",
+      "tag": "v3.51.0",
+      "name": "v3.51.0",
+      "releasedAt": "2025-04-29T06:47:17Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.51.0",
+      "tag": "3.51.0",
+      "name": "3.51.0",
+      "releasedAt": "2025-04-30T00:51:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.51.1",
+      "tag": "v3.51.1",
+      "name": "v3.51.1",
+      "releasedAt": "2025-05-12T01:32:51Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.52.0",
+      "tag": "v3.52.0",
+      "name": "v3.52.0",
+      "releasedAt": "2025-05-12T06:41:22Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.52.1",
+      "tag": "v3.52.1",
+      "name": "v3.52.1",
+      "releasedAt": "2025-05-14T06:44:20Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.52.2",
+      "tag": "v3.52.2",
+      "name": "v3.52.2",
+      "releasedAt": "2025-05-19T01:44:25Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.52.3",
+      "tag": "v3.52.3",
+      "name": "",
+      "releasedAt": "2025-05-19T07:16:18Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.52.0",
+      "tag": "3.52.0",
+      "name": "3.52.0",
+      "releasedAt": "2025-05-22T05:43:32Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.53.0",
+      "tag": "3.53.0",
+      "name": "3.53.0",
+      "releasedAt": "2025-06-02T01:19:37Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.53.1",
+      "tag": "3.53.1",
+      "name": "3.53.1",
+      "releasedAt": "2025-06-04T23:26:35Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.53.0",
+      "tag": "v3.53.0",
+      "name": "v3.53.0",
+      "releasedAt": "2025-06-05T02:41:21Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.53.1",
+      "tag": "v3.53.1",
+      "name": "",
+      "releasedAt": "2025-06-05T02:47:32Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.54.0",
+      "tag": "3.54.0",
+      "name": "3.54.0",
+      "releasedAt": "2025-06-10T07:21:59Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.54.0",
+      "tag": "v3.54.0",
+      "name": "v3.54.0",
+      "releasedAt": "2025-06-11T05:15:33Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.54.1",
+      "tag": "3.54.1",
+      "name": "3.54.1",
+      "releasedAt": "2025-06-12T05:43:39Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.55.0",
+      "tag": "v3.55.0",
+      "name": "v3.55.0",
+      "releasedAt": "2025-06-23T09:11:23Z"
+    },
+    {
+      "platform": "iOS",
+      "version": ".3.55.2",
+      "tag": "v.3.55.2",
+      "name": "v3.55.2",
+      "releasedAt": "2025-06-30T02:43:44Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.55.3",
+      "tag": "v3.55.3",
+      "name": "v3.55.3",
+      "releasedAt": "2025-07-07T05:13:22Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.55.4",
+      "tag": "v3.55.4",
+      "name": "v3.55.4",
+      "releasedAt": "2025-07-08T00:42:14Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.56.0",
+      "tag": "3.56.0",
+      "name": "3.56.0",
+      "releasedAt": "2025-07-14T10:02:22Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.56.0",
+      "tag": "v3.56.0",
+      "name": "v3.56.0",
+      "releasedAt": "2025-07-16T01:04:11Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.56.1",
+      "tag": "3.56.1",
+      "name": "3.56.1",
+      "releasedAt": "2025-07-21T07:50:27Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.56.2",
+      "tag": "v3.56.2",
+      "name": "v3.56.2",
+      "releasedAt": "2025-07-23T01:37:00Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.57.0",
+      "tag": "v3.57.0",
+      "name": "v3.57.0",
+      "releasedAt": "2025-07-29T07:35:58Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.56.2",
+      "tag": "3.56.2",
+      "name": "3.56.2",
+      "releasedAt": "2025-08-07T01:25:06Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.57.0",
+      "tag": "3.57.0",
+      "name": "3.57.0",
+      "releasedAt": "2025-08-07T01:28:34Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.57.1",
+      "tag": "3.57.1",
+      "name": "3.57.1",
+      "releasedAt": "2025-08-07T01:29:46Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.57.2",
+      "tag": "3.57.2",
+      "name": "3.57.2",
+      "releasedAt": "2025-08-07T01:35:16Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.57.3",
+      "tag": "3.57.3",
+      "name": "3.57.3",
+      "releasedAt": "2025-08-07T01:36:06Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.57.4",
+      "tag": "3.57.4",
+      "name": "3.57.4",
+      "releasedAt": "2025-08-08T07:39:34Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.58.0",
+      "tag": "3.58.0",
+      "name": "3.58.0",
+      "releasedAt": "2025-08-14T04:35:27Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.58.0",
+      "tag": "v3.58.0",
+      "name": "v3.58.0",
+      "releasedAt": "2025-08-14T08:10:48Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.58.1",
+      "tag": "v3.58.1",
+      "name": "v3.58.1",
+      "releasedAt": "2025-08-20T08:05:28Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.59.0",
+      "tag": "v3.59.0",
+      "name": "v3.59.0",
+      "releasedAt": "2025-08-27T00:30:51Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.59.0",
+      "tag": "3.59.0",
+      "name": "3.59.0",
+      "releasedAt": "2025-08-27T02:49:48Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.59.1",
+      "tag": "v3.59.1",
+      "name": "v3.59.1",
+      "releasedAt": "2025-08-28T00:31:37Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.59.2",
+      "tag": "v3.59.2",
+      "name": "v3.59.2",
+      "releasedAt": "2025-08-28T06:45:27Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.59.3",
+      "tag": "v3.59.3",
+      "name": "v3.59.3",
+      "releasedAt": "2025-09-03T06:43:49Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.59.1",
+      "tag": "3.59.1",
+      "name": "3.59.1",
+      "releasedAt": "2025-09-03T06:45:13Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.59.3",
+      "tag": "3.59.3",
+      "name": "3.59.3",
+      "releasedAt": "2025-09-03T06:46:45Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.60.0",
+      "tag": "3.60.0",
+      "name": "3.60.0",
+      "releasedAt": "2025-09-15T05:53:46Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.60.0",
+      "tag": "v3.60.0",
+      "name": "v3.60.0",
+      "releasedAt": "2025-09-16T04:13:33Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.60.1",
+      "tag": "3.60.1",
+      "name": "3.60.1",
+      "releasedAt": "2025-09-24T02:26:17Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.60.1",
+      "tag": "v3.60.1",
+      "name": "v3.60.1",
+      "releasedAt": "2025-09-26T01:46:42Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.60.2",
+      "tag": "3.60.2",
+      "name": "3.60.2",
+      "releasedAt": "2025-09-30T07:45:38Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.61.0",
+      "tag": "3.61.0",
+      "name": "3.61.0",
+      "releasedAt": "2025-09-30T07:48:31Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.61.0",
+      "tag": "v3.61.0",
+      "name": "v3.61.0",
+      "releasedAt": "2025-10-10T02:02:55Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.61.1",
+      "tag": "v3.61.1",
+      "name": "v3.61.1",
+      "releasedAt": "2025-10-10T02:06:51Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.61.1",
+      "tag": "3.61.1",
+      "name": "3.61.1",
+      "releasedAt": "2025-10-13T01:47:51Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.61.2",
+      "tag": "v3.61.2",
+      "name": "v3.61.2",
+      "releasedAt": "2025-10-14T00:08:08Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.61.2",
+      "tag": "3.61.2",
+      "name": "3.61.2",
+      "releasedAt": "2025-10-14T05:11:34Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.61.3",
+      "tag": "v3.61.3",
+      "name": "v3.61.3",
+      "releasedAt": "2025-10-20T07:41:03Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.61.3",
+      "tag": "3.61.3",
+      "name": "3.61.3",
+      "releasedAt": "2025-10-22T06:03:43Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.62.0",
+      "tag": "3.62.0",
+      "name": "3.62.0",
+      "releasedAt": "2025-10-29T01:46:31Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.62.1",
+      "tag": "3.62.1",
+      "name": "3.62.1",
+      "releasedAt": "2025-10-29T01:47:44Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.62.1",
+      "tag": "v3.62.1",
+      "name": "v3.62.1",
+      "releasedAt": "2025-10-30T01:06:27Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.62.2",
+      "tag": "3.62.2",
+      "name": "3.62.2",
+      "releasedAt": "2025-10-30T02:38:34Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.62.3",
+      "tag": "v3.62.3",
+      "name": "v3.62.3",
+      "releasedAt": "2025-11-03T07:06:42Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.62.3",
+      "tag": "3.62.3",
+      "name": "3.62.3",
+      "releasedAt": "2025-11-06T02:39:54Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.62.4",
+      "tag": "3.62.4",
+      "name": "3.62.4",
+      "releasedAt": "2025-11-06T02:41:49Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.63.0",
+      "tag": "v3.63.0",
+      "name": "v3.63.0",
+      "releasedAt": "2025-11-10T02:03:40Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.63.0",
+      "tag": "3.63.0",
+      "name": "3.63.0",
+      "releasedAt": "2025-11-12T05:44:10Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.63.1",
+      "tag": "v3.63.1",
+      "name": "v3.63.1",
+      "releasedAt": "2025-11-17T05:40:24Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.63.1",
+      "tag": "3.63.1",
+      "name": "3.63.1",
+      "releasedAt": "2025-11-24T02:42:45Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.64.0",
+      "tag": "3.64.0",
+      "name": "3.64.0",
+      "releasedAt": "2025-11-26T10:30:48Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.64.0",
+      "tag": "v3.64.0",
+      "name": "v3.64.0",
+      "releasedAt": "2025-12-16T00:55:25Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.64.1",
+      "tag": "v3.64.1",
+      "name": "v3.64.1",
+      "releasedAt": "2025-12-16T00:57:44Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.65.0",
+      "tag": "v3.65.0",
+      "name": "v3.65.0",
+      "releasedAt": "2025-12-16T04:19:46Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.65.0",
+      "tag": "3.65.0",
+      "name": "3.65.0",
+      "releasedAt": "2025-12-16T05:25:20Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.65.1",
+      "tag": "v3.65.1",
+      "name": "v3.65.1",
+      "releasedAt": "2025-12-22T07:27:07Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.65.2",
+      "tag": "v3.65.2",
+      "name": "v3.65.2",
+      "releasedAt": "2025-12-22T07:28:50Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.65.2",
+      "tag": "3.65.2",
+      "name": "3.65.2",
+      "releasedAt": "2025-12-23T02:00:21Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.65.3",
+      "tag": "v3.65.3",
+      "name": "v3.65.3",
+      "releasedAt": "2025-12-26T02:20:34Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.65.4",
+      "tag": "v3.65.4",
+      "name": "v3.65.4",
+      "releasedAt": "2025-12-26T02:21:36Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.65.3",
+      "tag": "3.65.3",
+      "name": "3.65.3",
+      "releasedAt": "2025-12-30T07:16:05Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.65.5",
+      "tag": "3.65.5",
+      "name": "3.65.5",
+      "releasedAt": "2025-12-30T07:18:15Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.65.5",
+      "tag": "v3.65.5",
+      "name": "v3.65.5",
+      "releasedAt": "2025-12-31T07:50:20Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.65.6",
+      "tag": "v3.65.6",
+      "name": "v3.65.6",
+      "releasedAt": "2025-12-31T07:59:30Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.65.6",
+      "tag": "3.65.6",
+      "name": "3.65.6",
+      "releasedAt": "2026-01-05T00:03:16Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.66.0",
+      "tag": "v3.66.0",
+      "name": "v3.66.0",
+      "releasedAt": "2026-01-13T01:48:41Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.66.0",
+      "tag": "3.66.0",
+      "name": "3.66.0",
+      "releasedAt": "2026-01-13T04:24:49Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.67.0",
+      "tag": "v3.67.0",
+      "name": "v3.67.0",
+      "releasedAt": "2026-01-27T03:56:14Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.67.0",
+      "tag": "3.67.0",
+      "name": "3.67.0",
+      "releasedAt": "2026-01-27T23:04:52Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.67.1",
+      "tag": "v3.67.1",
+      "name": "v3.67.1",
+      "releasedAt": "2026-01-28T05:04:53Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.67.1",
+      "tag": "3.67.1",
+      "name": "3.67.1",
+      "releasedAt": "2026-01-28T05:31:24Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.68.0",
+      "tag": "v3.68.0",
+      "name": "v3.68.0",
+      "releasedAt": "2026-02-09T01:40:27Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.68.0",
+      "tag": "3.68.0",
+      "name": "3.68.0",
+      "releasedAt": "2026-02-10T06:44:59Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.68.1",
+      "tag": "3.68.1",
+      "name": "3.68.1",
+      "releasedAt": "2026-02-11T23:40:29Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.68.2",
+      "tag": "3.68.2",
+      "name": "3.68.2",
+      "releasedAt": "2026-02-11T23:40:59Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.68.3",
+      "tag": "3.68.3",
+      "name": "3.68.3",
+      "releasedAt": "2026-02-12T23:01:59Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.68.5",
+      "tag": "v3.68.5",
+      "name": "v3.68.5",
+      "releasedAt": "2026-02-13T01:50:35Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.68.5",
+      "tag": "3.68.5",
+      "name": "3.68.5",
+      "releasedAt": "2026-02-19T05:43:08Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.69.0",
+      "tag": "v3.69.0",
+      "name": "v3.69.0",
+      "releasedAt": "2026-02-24T02:08:04Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.69.0",
+      "tag": "3.69.0",
+      "name": "3.69.0",
+      "releasedAt": "2026-02-24T06:15:42Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.69.1",
+      "tag": "v3.69.1",
+      "name": "v3.69.1",
+      "releasedAt": "2026-02-25T04:02:50Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.69.2",
+      "tag": "v3.69.2",
+      "name": "v3.69.2",
+      "releasedAt": "2026-03-10T09:40:23Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.70.0",
+      "tag": "3.70.0",
+      "name": "3.70.0",
+      "releasedAt": "2026-03-17T05:21:15Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.70.0",
+      "tag": "v3.70.0",
+      "name": "v3.70.0",
+      "releasedAt": "2026-03-18T01:27:02Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.70.1",
+      "tag": "v3.70.1",
+      "name": "v3.70.1",
+      "releasedAt": "2026-03-19T00:14:20Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.70.1",
+      "tag": "3.70.1",
+      "name": "3.70.1",
+      "releasedAt": "2026-03-24T00:37:50Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.70.2",
+      "tag": "3.70.2",
+      "name": "3.70.2",
+      "releasedAt": "2026-03-26T06:39:46Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.71.0",
+      "tag": "3.71.0",
+      "name": "3.71.0",
+      "releasedAt": "2026-03-31T05:29:41Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.71.0",
+      "tag": "v3.71.0",
+      "name": "v3.71.0",
+      "releasedAt": "2026-04-01T01:18:31Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.71.1",
+      "tag": "3.71.1",
+      "name": "3.71.1",
+      "releasedAt": "2026-04-01T02:13:57Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.72.0",
+      "tag": "v3.72.0",
+      "name": "v3.72.0",
+      "releasedAt": "2026-04-13T05:49:40Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.72.0",
+      "tag": "3.72.0",
+      "name": "3.72.0",
+      "releasedAt": "2026-04-15T04:34:35Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.72.2",
+      "tag": "3.72.2",
+      "name": "3.72.2",
+      "releasedAt": "2026-04-23T06:30:26Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.73.0",
+      "tag": "3.73.0",
+      "name": "3.73.0",
+      "releasedAt": "2026-04-28T05:38:51Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.72.1",
+      "tag": "v3.72.1",
+      "name": "v3.72.1",
+      "releasedAt": "2026-04-29T01:26:19Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.72.2",
+      "tag": "v3.72.2",
+      "name": "v3.72.2",
+      "releasedAt": "2026-04-29T01:29:44Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.73.0",
+      "tag": "v3.73.0",
+      "name": "v3.73.0",
+      "releasedAt": "2026-04-29T05:54:44Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.73.1",
+      "tag": "v3.73.1",
+      "name": "v3.73.1",
+      "releasedAt": "2026-05-04T07:10:52Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.74.0",
+      "tag": "v3.74.0",
+      "name": "v3.74.0",
+      "releasedAt": "2026-05-11T07:12:41Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.74.0",
+      "tag": "3.74.0",
+      "name": "3.74.0",
+      "releasedAt": "2026-05-12T05:16:36Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.74.1",
+      "tag": "3.74.1",
+      "name": "3.74.1",
+      "releasedAt": "2026-05-12T23:24:52Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.74.1",
+      "tag": "v3.74.1",
+      "name": "v3.74.1",
+      "releasedAt": "2026-05-14T21:44:50Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.74.2",
+      "tag": "3.74.2",
+      "name": "3.74.2",
+      "releasedAt": "2026-05-15T06:35:12Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.74.3",
+      "tag": "3.74.3",
+      "name": "3.74.3",
+      "releasedAt": "2026-05-18T02:20:11Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.75.0",
+      "tag": "3.75.0",
+      "name": "3.75.0",
+      "releasedAt": "2026-05-26T05:17:06Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.75.0",
+      "tag": "v3.75.0",
+      "name": "v3.75.0",
+      "releasedAt": "2026-05-26T05:23:13Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.76.0",
+      "tag": "v3.76.0",
+      "name": "v3.76.0",
+      "releasedAt": "2026-06-09T07:26:28Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.76.0",
+      "tag": "3.76.0",
+      "name": "3.76.0",
+      "releasedAt": "2026-06-10T05:52:20Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.76.2",
+      "tag": "3.76.2",
+      "name": "3.76.2",
+      "releasedAt": "2026-06-12T07:19:03Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.77.0",
+      "tag": "v3.77.0",
+      "name": "v3.77.0",
+      "releasedAt": "2026-06-23T01:58:34Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.77.1",
+      "tag": "v3.77.1",
+      "name": "v3.77.1",
+      "releasedAt": "2026-06-23T23:38:27Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.77.0",
+      "tag": "3.77.0",
+      "name": "3.77.0",
+      "releasedAt": "2026-06-24T01:34:27Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.77.2",
+      "tag": "v3.77.2",
+      "name": "v3.77.2",
+      "releasedAt": "2026-06-25T02:22:40Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.77.3",
+      "tag": "v3.77.3",
+      "name": "v3.77.3",
+      "releasedAt": "2026-06-30T05:07:19Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.77.3",
+      "tag": "3.77.3",
+      "name": "3.77.3",
+      "releasedAt": "2026-07-01T06:49:05Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.78.0",
+      "tag": "3.78.0",
+      "name": "3.78.0",
+      "releasedAt": "2026-07-07T05:04:34Z"
+    },
+    {
+      "platform": "iOS",
+      "version": "3.78.0",
+      "tag": "v3.78.0",
+      "name": "v3.80.0",
+      "releasedAt": "2026-07-08T02:39:24Z"
+    },
+    {
+      "platform": "Android",
+      "version": "3.78.1",
+      "tag": "3.78.1",
+      "name": "3.78.1",
+      "releasedAt": "2026-07-08T09:04:06Z"
+    }
+  ]
+}

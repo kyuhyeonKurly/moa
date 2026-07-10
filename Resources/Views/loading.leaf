@@ -139,7 +139,7 @@
                     <div style="text-align:center; color:#333;">
                         <h3 style="color: #d00;">오류가 발생했습니다</h3>
                         <p>${error.message}</p>
-                        <button onclick="location.href='/'" style="padding: 10px 20px; background: #5f0080; color: white; border: none; border-radius: 6px; cursor: pointer;">홈으로 돌아가기</button>
+                        <button onclick="location.href='/moa/'" style="padding: 10px 20px; background: #5f0080; color: white; border: none; border-radius: 6px; cursor: pointer;">홈으로 돌아가기</button>
                     </div>
                 `;
             }

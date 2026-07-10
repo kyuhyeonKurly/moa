@@ -17,6 +17,9 @@ public func configure(_ app: Application) async throws {
     app.commands.use(JiraDomainDetailCommand(), as: "jira-domain-detail")
     app.commands.use(JiraIssueTypeCommand(), as: "jira-issue-type")
     app.commands.use(JiraTicketDetailCommand(), as: "jira-ticket-detail")
+
+    // 반기 성과 취합
+    app.commands.use(RoundupWikiCommand(), as: "roundup-wiki")
     
     // register commands - Confluence
     app.commands.use(ConfluenceWikiCommand(), as: "confluence-wiki")

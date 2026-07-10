@@ -1,6 +1,6 @@
 import Vapor
 
-final class JiraAPIClient {
+final class JiraAPIClient: Sendable {
     let client: Client
     let apiBaseURL = "https://kurly0521.atlassian.net"
     let headers: HTTPHeaders

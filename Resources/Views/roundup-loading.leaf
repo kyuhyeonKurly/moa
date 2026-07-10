@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moa: 성과 취합 중...</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0; flex-direction: column;
+        }
+        .loader {
+            border: 4px solid #f3f3f3; border-top: 4px solid #5f0080;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .status { color: #333; font-size: 1.2rem; font-weight: 600; text-align: center; margin-bottom: 20px; }
+        .progress-container { width: 100%; max-width: 400px; height: 10px; background-color: #e0e0e0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+        .progress-bar { height: 100%; background-color: #5f0080; width: 0%; transition: width 0.3s ease; border-radius: 10px; }
+        .progress-text { font-size: 0.9rem; color: #666; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="loader"></div>
+    <div class="status">완료 티켓을 모아 분류하는 중입니다...</div>
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-text" id="progressText">0%</div>
+
+    <script>
+        const payload = {
+            year: #(year),
+            half: #(half),
+            platform: "#(platform)",
+            assignee: "#(assignee)",
+            email: "#(email)",
+            token: "#(token)",
+            spaceKey: "#(spaceKey)"
+        };
+
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressText').innerText = Math.floor(percent) + '%';
+        }
+
+        let currentProgress = 0;
+        const progressInterval = setInterval(() => {
+            if (currentProgress < 95) {
+                const increment = (95 - currentProgress) * 0.05;
+                currentProgress += Math.max(0.5, increment);
+                updateProgress(currentProgress);
+            }
+        }, 200);
+
+        async function run() {
+            try {
+                const response = await fetch('/moa/roundup/api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    let msg = errorText;
+                    try { const j = JSON.parse(errorText); if (j.reason) msg = j.reason; } catch (e) {}
+                    throw new Error(msg || '취합 실패');
+                }
+                clearInterval(progressInterval);
+                updateProgress(100);
+                const html = await response.text();
+                setTimeout(() => { document.open(); document.write(html); document.close(); }, 300);
+            } catch (error) {
+                clearInterval(progressInterval);
+                document.body.innerHTML = `
+                    <div style="text-align:center; color:#333;">
+                        <h3 style="color: #d00;">오류가 발생했습니다</h3>
+                        <p>${error.message}</p>
+                        <button onclick="location.href='/moa/'" style="padding: 10px 20px; background: #5f0080; color: white; border: none; border-radius: 6px; cursor: pointer;">홈으로 돌아가기</button>
+                    </div>`;
+            }
+        }
+        run();
+    </script>
+</body>
+</html>

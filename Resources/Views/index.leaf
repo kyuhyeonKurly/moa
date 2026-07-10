@@ -3,118 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moa - Jira 회고 리포트</title>
+    <title>Moa - Jira 리포트</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f5f5f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        h1 {
-            text-align: center;
-            color: #1d1d1f;
-            margin-bottom: 1.5rem;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #1d1d1f;
-        }
-        input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #d2d2d7;
-            border-radius: 8px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-        .help-text {
-            font-size: 0.8rem;
-            color: #86868b;
-            margin-top: 0.25rem;
-        }
-        button {
-            width: 100%;
-            padding: 1rem;
-            background-color: #0071e3;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-        button:hover {
-            background-color: #0077ed;
-        }
-        .token-link {
-            font-size: 0.8rem;
-            color: #0071e3;
-            text-decoration: none;
-            float: right;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f5f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 24px 0; }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 440px; }
+        h1 { text-align: center; color: #1d1d1f; margin-bottom: 1.25rem; }
+        .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+        .mode-card { text-align: left; border: 2px solid #e5e5ea; border-radius: 10px; padding: 12px; background: #fafafa; cursor: pointer; transition: .15s; }
+        .mode-card.active { border-color: #5f0080; background: #f5edfa; }
+        .mode-card .mtitle { font-weight: 700; font-size: .95rem; color: #1d1d1f; }
+        .mode-card .mdesc { font-size: .75rem; color: #86868b; margin-top: 3px; line-height: 1.3; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1d1d1f; }
+        input, select { width: 100%; padding: 0.8rem; border: 1px solid #d2d2d7; border-radius: 8px; font-size: 1rem; box-sizing: border-box; background: white; }
+        .help-text { font-size: 0.8rem; color: #86868b; margin-top: 0.25rem; }
+        button.submit { width: 100%; padding: 1rem; background-color: #5f0080; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
+        button.submit:hover { background-color: #6f1090; }
+        .token-link { font-size: 0.8rem; color: #0071e3; text-decoration: none; float: right; }
+        .greeting { text-align:center; margin-bottom: 1rem; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Moa 회고 리포트</h1>
-        
-        #if(savedEmail):
-        <div id="saved-account-section" class="form-group" style="text-align: center; margin-bottom: 2rem;">
-            <p style="font-size: 1.1rem; color: #1d1d1f;">👋 반가워요, <strong>#(savedEmail)</strong>님!</p>
-            <p class="help-text">저장된 계정으로 바로 리포트를 생성할까요?</p>
-            
-            <form action="/moa/collect" method="POST">
-                <div style="margin-bottom: 1rem; text-align: left;">
-                    <label for="quick-year" style="font-size: 0.9rem; color: #666;">회고 연도</label>
-                    <input type="number" id="quick-year" name="year" value="2025" style="padding: 0.5rem;">
-                </div>
-                
-                <div style="margin-bottom: 1rem; text-align: left;">
-                    <label for="quick-platform" style="font-size: 0.9rem; color: #666;">플랫폼 (선택)</label>
-                    <select id="quick-platform" name="platform" style="width: 100%; padding: 0.5rem; border: 1px solid #d2d2d7; border-radius: 8px; background: white;">
-                        <option value="">전체</option>
-                        <option value="iOS">iOS</option>
-                        <option value="Android">Android</option>
-                    </select>
-                </div>
+        <h1>Moa</h1>
 
-                <button type="submit" style="margin-bottom: 1rem;">🚀 바로 리포트 보기</button>
-            </form>
-            
-            <button onclick="document.getElementById('saved-account-section').style.display='none'; document.getElementById('login-form').style.display='block';" 
-                    style="background-color: #f5f5f7; color: #1d1d1f; border: 1px solid #d2d2d7;">
-                다른 계정으로 로그인
-            </button>
+        <div class="modes">
+            <div class="mode-card active" id="card-report" onclick="setMode('report')">
+                <div class="mtitle">📅 회고 리포트</div>
+                <div class="mdesc">연간 내 티켓 회고 (레거시)</div>
+            </div>
+            <div class="mode-card" id="card-roundup" onclick="setMode('roundup')">
+                <div class="mtitle">📊 반기 성과 취합</div>
+                <div class="mdesc">기획/기술/KTLO 분류 · 프로덕트앱팀</div>
+            </div>
+        </div>
+
+        #if(savedEmail):
+        <div class="greeting">
+            <p style="font-size: 1.05rem; color: #1d1d1f; margin:0;">👋 반가워요, <strong>#(savedEmail)</strong>님!</p>
+            <p class="help-text">저장된 계정으로 바로 진행합니다. (토큰 재입력 불필요)</p>
         </div>
         #endif
 
-        <form action="/moa/collect" method="POST" id="login-form" #if(savedEmail): style="display: none;" #endif>
+        <form action="/moa/collect" method="POST" id="mainForm">
             <div class="form-group">
-                <label for="year">회고 연도</label>
-                <input type="number" id="year" name="year" value="2025" required>
+                <label for="year">연도</label>
+                <input type="number" id="year" name="year" value="2026" required>
+            </div>
+
+            <div class="form-group" id="half-group" style="display:none;">
+                <label for="half">반기</label>
+                <select id="half" name="half">
+                    <option value="1">상반기 (1~6월)</option>
+                    <option value="2">하반기 (7~12월)</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label for="platform">플랫폼 (선택)</label>
-                <select id="platform" name="platform" style="width: 100%; padding: 0.8rem; border: 1px solid #d2d2d7; border-radius: 8px; font-size: 1rem; background: white;">
+                <select id="platform" name="platform">
                     <option value="">전체</option>
                     <option value="iOS">iOS</option>
                     <option value="Android">Android</option>
@@ -123,7 +70,7 @@
 
             <div class="form-group">
                 <label for="email">Jira 이메일</label>
-                <input type="email" id="email" name="email" placeholder="example@kurlycorp.com" required>
+                <input type="email" id="email" name="email" placeholder="example@kurlycorp.com" #if(savedEmail):value="#(savedEmail)"#else:required#endif>
             </div>
 
             <div class="form-group">
@@ -131,23 +78,39 @@
                     Jira API 토큰
                     <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" class="token-link">토큰 발급받기 &rarr;</a>
                 </label>
-                <input type="password" id="token" name="token" placeholder="API 토큰을 입력하세요" required>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #86868b;">
-                    <p style="margin: 0.2rem 0;">⚠️ 토큰은 <strong>생성 직후에만 복사</strong>할 수 있습니다. (다시 조회 불가)</p>
-                    <p style="margin: 0.2rem 0;">🔄 토큰을 잊어버렸거나 만료된 경우, 새로 생성해서 입력해주세요.</p>
-                    <p style="margin: 0.2rem 0;">🔒 입력한 토큰은 브라우저에 안전하게 저장됩니다.</p>
+                <input type="password" id="token" name="token" placeholder="#if(savedEmail):저장된 토큰 사용 (비우면 됨)#else:API 토큰을 입력하세요#endif" #if(savedEmail):#else:required#endif>
+                <div class="help-text">
+                    <p style="margin: 0.2rem 0;">⚠️ 토큰은 생성 직후에만 복사 가능합니다.</p>
+                    <p style="margin: 0.2rem 0;">🔒 입력한 토큰은 브라우저 쿠키에 저장됩니다.</p>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="spaceKey">
-                    Confluence Space Key (Optional)
-                </label>
-                <input type="text" id="spaceKey" name="spaceKey" placeholder="예: /wiki/spaces/appr/overview 👉 appr" #if(savedSpaceKey): value="#(savedSpaceKey)" #endif>
+                <label for="spaceKey">Confluence Space Key (선택)</label>
+                <input type="text" id="spaceKey" name="spaceKey" placeholder="예: appr 또는 개인 스페이스 키" #if(savedSpaceKey):value="#(savedSpaceKey)"#endif>
             </div>
 
-            <button type="submit">리포트 생성하기</button>
+            <button type="submit" class="submit" id="submitBtn">📅 회고 리포트 생성</button>
         </form>
     </div>
+
+    <script>
+        function setMode(mode) {
+            const form = document.getElementById('mainForm');
+            const halfGroup = document.getElementById('half-group');
+            const btn = document.getElementById('submitBtn');
+            document.getElementById('card-report').classList.toggle('active', mode === 'report');
+            document.getElementById('card-roundup').classList.toggle('active', mode === 'roundup');
+            if (mode === 'roundup') {
+                form.action = '/moa/roundup';
+                halfGroup.style.display = 'block';
+                btn.innerText = '📊 반기 성과 취합';
+            } else {
+                form.action = '/moa/collect';
+                halfGroup.style.display = 'none';
+                btn.innerText = '📅 회고 리포트 생성';
+            }
+        }
+    </script>
 </body>
 </html>

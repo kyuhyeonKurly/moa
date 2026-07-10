@@ -11,8 +11,15 @@ struct MoaController: RouteCollection {
         
         // 실제 데이터 처리 (API)
         moa.post("api", "report", use: generateReport)
-        
+
         moa.post("create-draft", use: createDraft)
+
+        // 모드 2: 반기 성과 취합 (프로덕트앱팀 특화)
+        let roundup = moa.grouped("roundup")
+        roundup.get(use: showRoundupLoading)
+        roundup.post(use: showRoundupLoading)
+        roundup.post("api", use: generateRoundup)
+        roundup.post("wiki", use: createRoundupDraft)
     }
 
     func index(req: Request) async throws -> View {
@@ -130,7 +137,100 @@ struct MoaController: RouteCollection {
         let editUrl = "https://kurly0521.atlassian.net/wiki/spaces/\(spaceKey)/pages/edit-v2/\(pageId)"
         return req.redirect(to: editUrl)
     }
-    
+
+    // MARK: - 모드 2: 반기 성과 취합
+
+    func showRoundupLoading(req: Request) async throws -> View {
+        let year = req.query[Int.self, at: "year"] ?? req.content[Int.self, at: "year"] ?? 2026
+        let half = req.query[Int.self, at: "half"] ?? req.content[Int.self, at: "half"] ?? 1
+        let platform = req.query[String.self, at: "platform"] ?? req.content[String.self, at: "platform"] ?? ""
+        let assignee = req.query[String.self, at: "assignee"] ?? req.content[String.self, at: "assignee"] ?? ""
+        let email = req.query[String.self, at: "email"] ?? req.content[String.self, at: "email"] ?? req.cookies["moa_email"]?.string ?? ""
+        let token = req.query[String.self, at: "token"] ?? req.content[String.self, at: "token"] ?? req.cookies["moa_token"]?.string ?? ""
+        let spaceKey = req.query[String.self, at: "spaceKey"] ?? req.content[String.self, at: "spaceKey"] ?? req.cookies["moa_space_key"]?.string ?? ""
+
+        return try await req.view.render("roundup-loading", [
+            "year": "\(year)",
+            "half": "\(half)",
+            "platform": platform,
+            "assignee": assignee,
+            "email": email,
+            "token": token,
+            "spaceKey": spaceKey
+        ])
+    }
+
+    func generateRoundup(req: Request) async throws -> Response {
+        let params = try req.content.decode(RoundupRequest.self)
+        try params.validate()
+
+        let cleanEmail = params.email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanToken = params.token.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let jiraClient = JiraAPIClient(client: req.client, email: cleanEmail, token: cleanToken)
+        let calendar = try ReleaseCalendar.load(on: req.application)
+        let service = RoundupService(apiClient: jiraClient, calendar: calendar, logger: req.logger)
+
+        let context = try await service.collect(request: params)
+
+        let view = try await req.view.render("roundup", context).get()
+        let response = try await view.encodeResponse(for: req).get()
+
+        response.cookies["moa_email"] = HTTPCookies.Value(string: cleanEmail, maxAge: 60*60*24*30, sameSite: .lax)
+        response.cookies["moa_token"] = HTTPCookies.Value(string: cleanToken, maxAge: 60*60*24*30, sameSite: .lax)
+        if let spaceKey = params.spaceKey, !spaceKey.isEmpty {
+            response.cookies["moa_space_key"] = HTTPCookies.Value(string: spaceKey, maxAge: 60*60*24*30, sameSite: .lax)
+        }
+        return response
+    }
+
+    func createRoundupDraft(req: Request) async throws -> RoundupDraftResponse {
+        let body = try req.content.decode(RoundupWikiRequest.self)
+
+        guard let email = req.cookies["moa_email"]?.string,
+              let token = req.cookies["moa_token"]?.string else {
+            throw Abort(.unauthorized, reason: "로그인이 필요합니다.")
+        }
+        guard !body.spaceKey.isEmpty else {
+            throw Abort(.badRequest, reason: "Confluence Space Key가 필요합니다.")
+        }
+
+        let jiraClient = JiraAPIClient(client: req.client, email: email, token: token)
+        let user = try await jiraClient.getMyself()
+        let calendar = try ReleaseCalendar.load(on: req.application)
+        let service = RoundupService(apiClient: jiraClient, calendar: calendar, logger: req.logger)
+
+        // 표시와 동일한 데이터를 재수집 후, 사람이 확정한 분류를 적용
+        let recollectRequest = RoundupRequest(
+            year: body.year, half: body.half, platform: body.platform,
+            assignee: nil, email: email, token: token, spaceKey: body.spaceKey
+        )
+        let context = try await service.collect(request: recollectRequest)
+
+        let html = buildRoundupWikiHtml(
+            context: context,
+            decisions: body.decisions ?? [:],
+            userName: user.displayName
+        )
+        let title = "\(context.halfLabel) 성과 취합 (\(user.displayName))"
+
+        let confluenceService = ConfluenceService(client: req.client)
+        let pageId = try await confluenceService.createPage(
+            spaceKey: body.spaceKey,
+            title: title,
+            htmlContent: html,
+            email: email,
+            token: token
+        )
+        let editUrl = "https://kurly0521.atlassian.net/wiki/spaces/\(body.spaceKey)/pages/edit-v2/\(pageId)"
+        return RoundupDraftResponse(editUrl: editUrl)
+    }
+
+    /// 4섹션(기획/기술/KTLO/크래시) + 검토 섹션 Confluence Storage HTML 생성.
+    private func buildRoundupWikiHtml(context: RoundupContext, decisions: [String: String], userName: String) -> String {
+        RoundupWikiRenderer.html(context: context, decisions: decisions, userName: userName)
+    }
+
     private func generateYearlyReportHtml(context: ReportContext, year: Int, userName: String) -> String {
         var html = """
         <p>Jira 티켓으로 돌아보는 \(year)년 (\(userName))</p>
