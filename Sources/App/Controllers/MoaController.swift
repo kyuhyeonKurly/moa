@@ -4,7 +4,10 @@ struct MoaController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         routes.get("", use: index)
         let moa = routes.grouped("moa")
-        
+
+        // 내부 nginx(/moa/ 프리픽스 프록시) 대응 — index를 /moa/ 에도 노출
+        moa.get("", use: index)
+
         // 화면 진입 (Loading 페이지)
         moa.get("collect", use: showLoadingPage)
         moa.post("collect", use: showLoadingPage)
