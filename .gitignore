@@ -19,3 +19,6 @@ playground.xcworkspace
 exports/
 tickets_*.md
 domain-guideline*.md
+
+# stray build backups
+.build_backup_*/
